@@ -1,0 +1,219 @@
+﻿@model VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel
+@using RER.Tools.MVC.Agid
+@{
+    ViewBag.Title = "Riepilogo data entry";
+}
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2 class="card-title">Ricerca procedimento</h2>
+            @using (Html.BeginForm("RiepilogoDataEntry", "Report", FormMethod.Get, new { @id = "formRiepilogoDataEntry" }))
+            {
+                <br />
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownList("IdProcedimento", "Procedimento", Model.ElencoProcedimenti, null, optionLabel: "Selezionare un procedimento", required: true, useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-3">
+                        @Html.AgidDropDownList("IdRaggruppamento", "Raggruppamento", Model.ElencoRaggruppamenti, null, optionLabel: "Selezionare un raggruppamento", required: true, useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary" title="Cerca tra i procedimenti"><i class='fas fa-search' aria-hidden="true"></i> Cerca</button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary" title="Torna ai report"><i class="far fa-file-alt"></i> Torna ai report</a>
+                        <a href="@Url.Action("RiepilogoDataEntry")" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.RisultatoRicerca != null)
+{
+    <div class="card-wrapper card-space">
+        <div class="card card-bg">
+            <div class="card-body">
+                <h2 class="card-title">Riepilogo </h2>
+                @if (Model.RisultatoRicerca.Any())
+                {
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-condensed table-hover table-sm">
+                                    <thead>
+                                        <tr>
+
+                                            @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Comune)
+                                            {
+                                                <th scope="col">
+                                                    <label>Provincia</label>
+                                                </th>
+                                            }
+                                            <th scope="col">
+                                                @{
+                                                    string lblRaggruppamento = "";
+                                                }
+                                                @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                                {
+                                                    lblRaggruppamento = "Postazione.Modulo";
+                                                }
+                                                else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Postazione)
+                                                {
+                                                    lblRaggruppamento = "Postazione";
+                                                }
+                                                else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Provincia)
+                                                {
+                                                    lblRaggruppamento = "Provincia";
+                                                }
+                                                else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Comune)
+                                                {
+                                                    lblRaggruppamento = "Comune";
+                                                }
+                                                <label id="hmRiga">@lblRaggruppamento</label>
+                                            </th>
+                                            @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                            {
+                                                <th scope="col">
+                                                    <label id="hmStato">Stato</label>
+                                                </th>
+                                            }
+                                            <th scope="col" class="text-right">
+                                                <label id="hmNome">Righe valide</label>
+                                            </th>
+                                            <th scope="col" class="text-right">
+                                                <label id="hmCognome">Righe nulle</label>
+                                            </th>
+                                            <th scope="col" class="text-right">
+                                                <label id="hmNascita">Righe sanabili</label>
+                                            </th>
+                                            <th scope="col" class="text-right">
+                                                <label id="hmData">Righe totali</label>
+                                            </th>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            string provinciaRaggruppamento = null;
+                                            int rowSpan = 0;
+                                        }
+
+                                        @foreach (var item in Model.RisultatoRicerca)
+                                        {
+                                            <tr>
+                                                @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Comune)
+                                                {
+                                                    if (provinciaRaggruppamento == null || provinciaRaggruppamento != item.CodicePostazione)
+                                                    {
+                                                        provinciaRaggruppamento = item.CodicePostazione;
+                                                        rowSpan = Model.RisultatoRicerca.Count(x => x.CodicePostazione == provinciaRaggruppamento);
+
+                                                        <td rowspan="@rowSpan">
+                                                            @(item.CodicePostazione == "zzz" ? "" : item.CodicePostazione)
+                                                        </td>
+                                                    }
+                                                }
+
+                                                <td>
+                                                    @{
+                                                        string codice = "";
+                                                    }
+                                                    @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                                    {
+                                                        codice = $"{item.CodicePostazione}.{item.NumeroModulo}";
+                                                    }
+                                                    else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Postazione)
+                                                    {
+                                                        codice = $"{item.CodicePostazione}";
+                                                    }
+                                                    else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Provincia)
+                                                    {
+                                                        codice = $"{item.CodicePostazione}";
+                                                    }
+                                                    else if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Comune)
+                                                    {
+                                                        codice = item.NumeroModulo == "zzz" ? "NON IMPOSTATO" : $"{item.NumeroModulo}";
+                                                    }
+
+                                                    @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                                    {
+                                                        <a href="@Url.Action("Compila", "Modulo", new { @IdModulo = item.IdModulo })" title="Vai al modulo">@codice</a>
+                                                    }
+                                                    else
+                                                    {
+                                                        @codice
+                                                    }
+                                                </td>
+                                                @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                                {
+                                                    <td>
+                                                        @item.Stato
+                                                    </td>
+                                                }
+                                                <td class="text-right">
+                                                    @item.RecordValidi.Value.ToString("N0")
+                                                </td>
+                                                <td class="text-right">
+                                                    @item.RecordNulli.Value.ToString("N0")
+                                                </td>
+                                                <td class="text-right">
+                                                    @item.RecordSanabili.Value.ToString("N0")
+                                                </td>
+                                                <td class="text-right">
+                                                    @item.RecordTotali.Value.ToString("N0")
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="border-top: 1.5px solid">
+                                            <th>
+                                                <strong>Totale</strong>
+                                            </th>
+                                            @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Comune)
+                                            {
+                                                <th>
+                                                    &nbsp;
+                                                </th>
+                                            }
+
+                                            @if (Model.IdRaggruppamento.Value == (int)VerificaFirme.WebUI.Models.RiepilogoDataEntryViewModel.TipoRaggruppamentoDataEntry.Modulo)
+                                            {
+                                                <th>
+                                                    &nbsp;
+                                                </th>
+                                            }
+                                            <td class="text-right">
+                                                <strong>@Model.RisultatoRicerca.Sum(x => x.RecordValidi).Value.ToString("N0")</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>@Model.RisultatoRicerca.Sum(x => x.RecordNulli).Value.ToString("N0")</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>@Model.RisultatoRicerca.Sum(x => x.RecordSanabili).Value.ToString("N0")</strong>
+                                            </td>
+                                            <td class="text-right">
+                                                <strong>@Model.RisultatoRicerca.Sum(x => x.RecordTotali).Value.ToString("N0")</strong>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <p>Nessun dato presente</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

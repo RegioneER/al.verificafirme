@@ -1,0 +1,252 @@
+﻿.demoWrapper {
+    padding: 10px;
+    background: white;
+    box-sizing: border-box;
+    resize: horizontal;
+    border: 1px solid;
+    border-color: darkgrey;
+    max-width: 100%;
+    max-height: 150px;
+    max-width: 340px;
+    display: inline-flex;
+    margin: 0.5em;
+    vertical-align: middle;
+}
+
+div.demoWrapper {
+    width: 100%;
+}
+
+    div.demoWrapper.red {
+        width: 100%;
+        background: #ba0000;
+    }
+
+    div.demoWrapper.yellow {
+        width: 100%;
+        background: yellow;
+    }
+
+    div.demoWrapper.green {
+        width: 100%;
+        background: green;
+    }
+
+    div.demoWrapper.blue {
+        width: 100%;
+        background: #3498DB;
+    }
+
+    div.demoWrapper div.card-header {
+        height: 50%;
+    }
+
+b a {
+    color: black;
+}
+
+.largo {
+    width: 245px !important;
+}
+
+.icon-primary {
+    fill: white !important;
+}
+
+#overlay {
+    background: #ffffff;
+    opacity: 0.9;
+    color: #666666;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    z-index: 5000;
+    top: 0;
+    left: 0;
+    float: left;
+    text-align: center;
+    padding-top: 15%;
+}
+
+    #overlay p {
+        opacity: 5 !important;
+        font-size: larger;
+        font-weight: bold;
+    }
+
+.optionDirezione {
+    padding-left: 35px !important;
+}
+
+.optionEnte {
+    font-weight: bold;
+}
+
+.optionServizio {
+    padding-left: 45px !important;
+}
+
+.casetta {
+    z-index: 0;
+}
+
+.dropdown-menu {
+    z-index: 1020;
+}
+
+.maxAlt {
+    max-height: 200px !important;
+    min-height: 150px !important;
+}
+
+.breadcrumb {
+    display: inline-flex !important;
+    padding-bottom: 0px !important;
+    padding-top: 12px !important;
+}
+
+.margineSinistro {
+    margin-left: 20px;
+}
+
+.card:after {
+    margin-top: 1px !important;
+}
+
+#menu a:focus, .toggles label input[type='checkbox']:focus + .lever {
+    border-color: white;
+    box-shadow: 0 0 0 2px white;
+    outline: none;
+}
+
+a.read-more {
+    color: #CB1D15;
+}
+
+    a.read-more:hover {
+        color: #CB1D15;
+        text-decoration: none;
+    }
+
+b.bold-card-dettaglio {
+    font-family: Titillium Web, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    color: black;
+    font-size: 18px;
+}
+
+span.text-card-dettaglio {
+    font-family: Titillium Web, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    color: black;
+    font-size: 18px;
+}
+
+div.card-text.card-text-dettaglio {
+    font-family: Titillium Web, HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    color: #19191a;
+    font-size: 18px;
+}
+
+.bootstrap-select-wrapper .dropdown.bootstrap-select .dropdown-menu[x-placement='top-start'] {
+    z-index: 9999;
+}
+
+@media screen and (min-width: 992px) {
+    .maxAlt .it-hero-text-wrapper.bg-dark {
+        padding: 40px 40% 70px 34px;
+    }
+}
+
+.piccolo {
+    flex-basis: 2% !important;
+}
+
+.comuneCol {
+    flex-basis: 13% !important;
+}
+
+.cognomeCol {
+    flex-basis: 10% !important;
+    max-width: 11% !important;
+}
+
+/*Nascondo l'icona del datepicker*/
+input.datepickerNoIcon[type="date"]::-webkit-inner-spin-button,
+input.datepickerNoIcon[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+.autocomplete__menu {
+    color: black !important;
+}
+
+li.autocomplete__option--focused {
+    color: black !important;
+}
+
+.autocomplete__input {
+    background-color: white !important;
+}
+
+.select-wrapper select:disabled {
+    font-weight: 700 !important;
+}
+
+.conMargini {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+.conBordo {
+    border-bottom: 9px solid white !important;
+    border-right: 1px solid #d6dce3 !important;
+    border-top: 1px solid #d6dce3 !important;
+}
+
+.noBordo {
+    border-bottom: 9px solid white !important;
+}
+
+.trBassa {
+    margin-top: 10px !important;
+}
+
+.tdPiccola {
+    padding: 12px !important;
+}
+
+.casetta {
+    z-index: 0;
+}
+
+.breadcrumb {
+    display: inline-flex !important;
+    padding-bottom: 0px !important;
+    padding-top: 12px !important;
+}
+
+.dropdownMenuLink {
+    text-decoration: none;
+    border-color: #cb1d15;
+    background-color: #cb1d15;
+}
+
+
+.it-footer-main .link-list-wrapper ul li a:hover, .it-footer-main .link-list-wrapper ul li a:focus, .it-footer-main a:hover .it-footer-main a:focus, .list-item:hover, .list-item:focus {
+    background-color: transparent;
+}
+
+
+.btn, .btn-default {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    color: #003e54;
+}
+
+
+.btn-link  {
+    border: 2px solid transparent !important;
+    background: transparent !important;
+}

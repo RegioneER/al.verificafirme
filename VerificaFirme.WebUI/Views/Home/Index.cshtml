@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewBag.Title = ViewBag.NomeApplicativo;
+}
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <p class="card-text">
+                L'applicativo @ViewBag.NomeApplicativo ha l'obiettivo di fornire gli strumenti per la verifica firme relative a una richiesta di Referendum o a una Proposta di Legge di Iniziativa Popolare.<br />
+                La verifica delle firme è necessaria sia in fase di presentazione della richiesta per attestarne l'ammissibilità sia in fase di verifica del raggiungimento del quorum per la presentazione del Referendum o della Proposta di Legge di Iniziativa Popolare.
+            </p>
+            <dl class="row">
+                <dt class="col-sm-3">Guida utente</dt>
+                <dd class="col-sm-9">
+                    <a href="~/Documenti/@ViewBag.GuidaInLinea" title="Scarica la guida dell'applicativo"><span><i class="fas fa-file-pdf"></i> Scarica la guida</span></a>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,965 @@
+﻿@using RER.Tools.MVC.Agid
+@model VerificaFirme.WebUI.Models.ModuloViewModel
+
+@{
+    ViewBag.Title = "Controllo amministrativo";
+    SelectList comuni = Model.ElencoComuniRestoItalia;
+    SelectList comuniPr = Model.ElencoComuniPropri;
+
+    int nrRisultatiAutocomplete = Model.NrMaxRisultatiAutocomplete;
+
+    int nrMinimoCaratteriAutocomplete = Model.NrMinimoCaratteriAutocomplete;
+
+    string getDescComune(string codice)
+    {
+        SelectListItem sli = comuni.FirstOrDefault(x => x.Value == (codice ?? ""));
+        if (sli == null)
+        {
+            sli = comuniPr.FirstOrDefault(x => x.Value == (codice ?? ""));
+        }
+
+        return HttpUtility.JavaScriptStringEncode((sli?.Text ?? ""));
+    }
+
+    string getDescComuneNoEncode(string codice)
+    {
+        SelectListItem sli = comuni.FirstOrDefault(x => x.Value == (codice ?? ""));
+        if (sli == null)
+        {
+            sli = comuniPr.FirstOrDefault(x => x.Value == (codice ?? ""));
+        }
+        return sli?.Text ?? "";
+    }
+
+
+    var elencoErrori = (List<VerificaFirme.WebUI.Models.ErroreValidazioneForm>)ViewBag.Errori;
+    var procedimento = Model.Procedimento;
+    bool solaLettura = procedimento.IsConcluso;
+
+    ViewBag.IdModulo = Model.Modulo.ID;
+}
+<h2>@ViewBag.SottoTitolo</h2>
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+@Html.Partial("_partialDatiGeneraliProcedura", Model)
+<script src="~/Scripts/accessibleautocomplete.min.js"></script>
+
+
+@if (elencoErrori != null)
+{
+    <script>
+        function evidenziaErrori() {
+            $("input").removeAttr("aria-invalid");
+            $("input").removeClass("is-invalid");
+            @foreach (var item in elencoErrori)
+            {
+                @Html.Raw($"$('#{item.id}').addClass('is-invalid');");@Html.Raw($"$('#{item.id}').attr('aria-invalid', 'true');");
+            }
+        }
+    </script>
+}
+<script>
+
+        @Html.Raw("const comuni = [")
+        @foreach (var item in comuni)
+        {
+            @Html.Raw("'" + item.Text.Replace("'", "\\'") + "',\n");
+        }
+        @Html.Raw("];")
+
+        @Html.Raw("const comuniPR = [")
+        @foreach (var item in comuniPr)
+        {
+            @Html.Raw("'" + item.Text.Replace("'", "\\'") + "',\n");
+        }
+
+    @Html.Raw("];")
+
+    function suggest(query, populateResults) {
+        var comuneTot = comuni.concat(comuniPR);
+        var index = comuneTot.indexOf("NON TROVATO");
+
+        var x = comuneTot.splice(index, 1);
+
+        comuneTot.sort();
+        if (query.length >= @nrMinimoCaratteriAutocomplete) {
+            const filteredResults = comuneTot.filter(comuni => comuni.startsWith(query.toUpperCase()) === true).slice(0, @nrRisultatiAutocomplete);
+
+            if (filteredResults.length == 0) {
+                //debugger;
+                const filteredResultsNonTrovato = comuneTot.filter(comuni => comuni.startsWith("NON TROVAT") === true).slice(0, @nrRisultatiAutocomplete);
+                populateResults(filteredResultsNonTrovato);
+            }
+            else {
+                populateResults(filteredResults);
+            }
+        }
+        else
+        {
+            const filteredResults = comuneTot.filter(comuni => comuni.startsWith('XXX') === true);
+            populateResults(filteredResults);
+        }
+
+    }
+
+    function suggestPR(query, populateResults) {
+        if (query.length >= @nrMinimoCaratteriAutocomplete) {
+            const filteredResults = comuniPR.filter(comuni => comuni.startsWith(query.toUpperCase()) === true).slice(0, @nrRisultatiAutocomplete);
+
+            if (filteredResults.length == 0) {
+                //debugger;
+                const filteredResultsNonTrovato = comuniPR.filter(comuni => comuni.startsWith("NON TROVAT") === true).slice(0, @nrRisultatiAutocomplete);
+                populateResults(filteredResultsNonTrovato);
+            }
+            else {
+                populateResults(filteredResults);
+            }
+        }
+        else
+        {
+            const filteredResults = comuniPR.filter(comuni => comuni.startsWith('XXX') === true);
+            populateResults(filteredResults);
+        }
+
+    }
+
+    function mostraAvvisoOperazioniModulo() {
+        BloccaTimer();
+        var nrRigheModulo = @Model.Modulo.NumeroRighe;
+        var nrRigheNuovo = $("#NrNominativiOperazioni").val();
+        var nrErrori = 0;
+        var comuneLista = $("input#ComuneLista").val();
+        var nullo = $('#IsNullochk');
+
+
+        var messaggioDaAppendere = "";
+        if (nrRigheModulo > nrRigheNuovo) {
+            nrErrori++;
+            messaggioDaAppendere += "- le ultime " + (nrRigheModulo - nrRigheNuovo) + " righe verranno eliminate definitivamente\n";
+        }
+        if (comuneLista.length > 0) {
+            nrErrori++;
+            messaggioDaAppendere += "- il comune elettorale sarà sovrascritto per tutte le righe\n";
+        }
+
+        if (nullo.is(':checked')) {
+            nrErrori++;
+            messaggioDaAppendere += "- il modulo verrà impostato come nullo con la motivazione indicata\n";
+        }
+        else {
+            nrErrori++;
+            messaggioDaAppendere += "- il modulo NON verrà impostato come nullo\n";
+        }
+
+        var message = "";
+
+        if (nrErrori == 0) {
+            message="Attenzione! Si desidera procere con questa operazione?";
+        }else if (nrErrori < 2) {
+            message = "Attenzione! Se si decide di proseguire verrà eseguita la seguente operazione:\n";
+            message += messaggioDaAppendere;
+            message += "\nL'operazione non potrà essere annullata. Si desidera procedere?";
+        }
+        else {
+            message = "Attenzione! Se si decide di proseguire verranno eseguite le seguenti operazioni:\n";
+            message += messaggioDaAppendere;
+            message += "\nLe operazioni non potranno essere annullate. Si desidera procedere?";
+        }
+
+        return message;
+    }
+
+     function mostraAvvigiGenerici() {
+        BloccaTimer();
+        return "Sei sicuro di voler procedere con l'operazione richiesta?";
+    }
+
+    $(document).ready(function () {
+        $('#IsNullochk').change(function () {
+            if (this.checked) {
+                $('#MotivoNullita').prop('disabled', false);
+                $("#MotivoNullita").val('');
+                $("#IsNullo").val('true');
+            }
+            else {
+                $('#MotivoNullita').prop('disabled', true);
+                $("#MotivoNullita").val('');
+                $("#IsNullo").val('false');
+            }
+        });
+
+
+        @if (elencoErrori != null)
+        {
+            string evErrori = "evidenziaErrori();";
+            @evErrori;
+        }
+
+        });
+
+
+</script>
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h3 class="card-title">Configurazioni del modulo</h3>
+            @using (Html.BeginForm("SalvaOperazioniSulModulo", "ControlloAmministrativo", FormMethod.Post))
+            {
+                string chk = Model.Modulo.IsNullo ? "checked" : "";
+                @Html.AntiForgeryToken();
+                <input type="hidden" id="IdModuloOperazioni" name="IdModulo" value="@Model.Modulo.ID">
+                <input type="hidden" id="IdProcedimentoOperazioniNuovoModulo" name="IdProcedimento" value="@procedimento.ID">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-2">
+                        <div>
+                            <div class="form-check">
+                                <input type="hidden" id="IsNullo" name="IsNullo" value="@Model.Modulo.IsNullo">
+                                @if (solaLettura)
+                                {
+                                    <input id="IsNullochk" name="IsNullochk" type="checkbox" @chk disabled>
+                                }
+                                else
+                                {
+                                    <input id="IsNullochk" name="IsNullochk" type="checkbox" @chk>
+                                }
+                                <label for="IsNullochk">Modulo nullo</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-4">
+                        @if (solaLettura)
+                        {
+                            if (!string.IsNullOrEmpty(Model.Modulo.CodCategoriaEsclusione))
+                            {
+                                SelectListItem cat = Model.CategorieNullita.FirstOrDefault(x => x.Value == Model.Modulo.CodCategoriaEsclusione);
+                                string testo = cat != null ? cat.Text : "";
+                                <input type="text" id="MotivoNullita" name="MotivoNullita" value="@testo" class="form-control" readonly aria-readonly='true' />
+                            }
+                        }
+                        else
+                        {
+                            <div class="select-wrapper">
+                                <label for="MotivoNullita" id="idMotivazioneNullita" class="control-label required">Motivazione</label>
+                                <select id="MotivoNullita" name="MotivoNullita" title="Selezionare una motivazione" aria-labelledby="idMotivazioneNullita" disabled data-val-required="Il campo Motivazione è obbligatorio" aria-required="true" data-val="true">
+                                    <option value="" @(string.IsNullOrWhiteSpace(Model.Modulo.CodCategoriaEsclusione) ? "selected" : "")>Selezionare una motivazione</option>
+                                    @foreach (var cat in Model.CategorieNullita)
+                                    {
+                                        <option @(cat.Value == Model.Modulo.CodCategoriaEsclusione ? "selected" : "") value="@cat.Value">@cat.Text</option>
+                                    }
+                                </select>
+                                <span class="field-validation-valid text-danger" data-valmsg-for="MotivoNullita" data-valmsg-replace="true"></span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="select-wrapper">
+                            <label for="ComuneLista">Comune elettorale</label>
+                            @if (solaLettura)
+                            {
+                                <input type="text" id="ComuneLista" name="ComuneLista" value="@HttpUtility.HtmlDecode(getDescComuneNoEncode(Model.Modulo.CodComuneListaElettorale))" class="form-control" readonly aria-readonly='true' />
+                            }
+                            else
+                            {
+                                <div id="divComuneLista"></div>
+                                <script>
+                                element = document.querySelector('#divComuneLista')
+                                id = 'ComuneLista'
+                                accessibleAutocomplete({
+                                    element: element,
+                                    id: id,
+                                    name: 'ComuneLista',
+                                    showAllValues: true,
+                                    source: suggestPR,
+                                    defaultValue: '@getDescComune(Model.Modulo.CodComuneListaElettorale)',
+                                    confirmOnBlur: true,
+                                    autoselect: true,
+                                    dropdownArrow: () => '',
+                                    tNoResults: () => 'NON TROVATO'
+                                })
+                                </script>
+                            }
+                        </div>
+                        <br />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-2">
+                        @if (solaLettura)
+                        {
+                            <label for="NrNominativiOperazioni" class="input-number-label">Numero nominativi</label>
+                            <input type="text" id="NrNominativiOperazioni" name="NrNominativi" value="@Model.Modulo.NumeroRighe" class="form-control" readonly aria-readonly='true' />
+                        }
+                        else
+                        {
+                            <div>
+                                <div class="form-group">
+                                    <label for="NrNominativiOperazioni" class="input-number-label">Numero nominativi</label>
+                                    <input type="number" name="NrNominativi" class="form-control" id="NrNominativiOperazioni" value="@Model.Modulo.NumeroRighe" step="1" min="@Model.Modulo.UltimaRigaCompletata" max="@Model.NumeroMaxRigheModulo">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                if (!solaLettura)
+                {
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-10">
+                            <button type="submit" id="btnSalvaModulo" class="btn btn-default nospinner" onClick="if (confirm(mostraAvvisoOperazioniModulo())) { return true; } else { RipartiTimer(); return false;}" title="Salva la configurazione del modulo"><i class="far fa-save"></i> Configura modulo</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h3 class="card-title">Operazioni sui nominativi</h3>
+            @{
+                string visDiv = Model.Modulo.IsCompleto ? "block" : "none";
+            }
+            <div class="alert alert-info" role="alert" style="display:@visDiv" id="divModuloConcluso">
+                Questo modulo è concluso.
+            </div>
+            <div aria-live="polite">
+                <p class="text-primary font-weight-semibold"><span id="TempoSalvataggio"></span></p>
+            </div>
+            @if (elencoErrori != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">Impossibile completare il modulo! Sono presenti @elencoErrori.Count() errori di validazione.</h4>
+                    <ul style="max-height: 6em; overflow-y: auto;">
+                        @foreach (var err in elencoErrori)
+                        {
+                            <li>Riga nr. @err.Riga - @err.NomeCampo - @err.DescrizioneErrore</li>
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="alert alert-danger" role="alert" id="divAlertSalvataggioTemp" style="display: none">
+                <h4 class="alert-heading">Impossibile salvare il modulo! Si sono verificati degli errori durante l'ultimo salvataggio automatico. Verrà effettuato un nuovo tentativo al prossimo salvataggio automatico.</h4>
+            </div>
+            @using (Html.BeginForm("Salva", "ControlloAmministrativo", FormMethod.Post, new { @id = "formCompilazioneModulo" }))
+            {
+                @Html.AntiForgeryToken();
+                <input type="hidden" id="IdModulo" name="IdModulo" value="@Model.Modulo.ID">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-1 piccolo">
+                            <label id="hmRiga">#</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-1">
+                            <label id="hmNome">Nome</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-1">
+                            <label id="hmCognome">Cognome</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <label id="hmNascita">Luogo nascita</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-1">
+                            <label id="hmData">Data nascita</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <label id="hmElettorale">Comune elet.</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-1">
+                            <label id="hmLista">N. lista elet.</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-1">
+                            <label id="hmSanabilita">Cat. sanabilità</label>
+                        </div>
+                        <div class="col-xs-12 col-sm-2">
+                            <label id="hmNullita">Cat. nullità</label>
+                        </div>
+                        <div class="col-xs-12 col-sm">
+                            <label id="hmNote">Note</label>
+                        </div>
+                    </div>
+
+                    @if (Model.Modulo.ModuloNominativo.Any())
+                    {
+                        int i = 0;
+                        foreach (var item in Model.Modulo.ModuloNominativo.OrderBy(x => x.NumeroRiga))
+                        {
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-1 piccolo">
+                                    @item.NumeroRiga
+                                    <input type="hidden" name="Righe[@i].NrRiga" id="Righe_@(i)_NrRiga" value=" @item.NumeroRiga">
+                                </div>
+                                <div class="col-xs-12 col-sm-1">
+                                    <input id="Righe_@(i)_Nome" name="Righe[@i].Nome" type="text" class="form-control text-uppercase" maxlength="100" aria-labelledby="hmNome" onkeydown="AnnullaInserimento(event, this);" value="@item.Nome" @(solaLettura ? "readonly aria-readonly=true" : "")>
+                                </div>
+                                <div class="col-xs-12 col-sm-1 ">
+                                    <input id="Righe_@(i)_Cognome" name="Righe[@i].Cognome" type="text" class="form-control text-uppercase" maxlength="100" aria-labelledby="hmCognome" onkeydown="AnnullaInserimento(event, this);" value="@item.Cognome" @(solaLettura ? "readonly aria-readonly=true" : "")>
+                                </div>
+                                <div class="col-xs-12 col-sm-2 ">
+                                    @if (solaLettura)
+                                    {
+                                        <input id="Righe_@(i)_LuogoNascita" name="Righe[@i].LuogoNascita" type="text" class="form-control text-uppercase" aria-labelledby="hmNascita" value="@HttpUtility.HtmlDecode(getDescComuneNoEncode(item.CodComuneNascita))" readonly aria-readonly='true'>
+                                    }
+                                    else
+                                    {
+                                        <div id="divRighe_@(i)_LuogoNascita"></div>
+                                        <script>
+                                            element = document.querySelector('#divRighe_@(i)_LuogoNascita')
+                                            id = 'Righe_@(i)_LuogoNascita'
+                                            accessibleAutocomplete({
+                                                element: element,
+                                                id: id,
+                                                name: 'Righe[@i].LuogoNascita',
+                                                showAllValues: true,
+                                                source: suggest,
+                                                defaultValue: '@getDescComune(item.CodComuneNascita)',
+                                                confirmOnBlur: true,
+                                                autoselect: true,
+                                                dropdownArrow: () => '',
+                                                tNoResults: () => 'Comune non trovato',
+                                                lblby: 'hmNascita'
+
+                                            })
+                                        </script>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm-1">
+                                    @if (solaLettura)
+                                    {
+                                        <input type="text" id="Righe_@(i)_DataNascitaString" class="form-control" aria-labelledby="hmData" name="Righe[@i].DataNascitaString" value="@(item.DataNascita?.ToString("dd/MM/yyyy") ?? string.Empty)" readonly aria-readonly='true'>
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="Righe_@(i)_DataNascitaString" class="form-control" aria-labelledby="hmData" name="Righe[@i].DataNascitaString" value="@(item.DataNascita?.ToString("dd/MM/yyyy") ?? string.Empty)" onkeydown="AnnullaInserimento(event, this);" onblur="formattaData(event, this)">
+                                    }
+                                    <input type="hidden" id="Righe_@(i)_DataNascita" name="Righe[@i].DataNascita" value="@(item.DataNascita?.ToString("yyyy-MM-dd") ?? string.Empty)">
+                                </div>
+                                <div class="col-xs-12 col-sm-2 ">
+                                    @if (solaLettura)
+                                    {
+                                        <input id="Righe_@(i)_ComuneElettorale" name="Righe[@i].ComuneElettorale" type="text" class="form-control" aria-labelledby="hmElettorale" value="@HttpUtility.HtmlDecode(getDescComuneNoEncode(item.CodComuneListaElettorale))" readonly>
+                                    }
+                                    else
+                                    {
+                                        <div id="divRighe_@(i)_ComuneElettorale"></div>
+                                        <script>
+                                            element = document.querySelector('#divRighe_@(i)_ComuneElettorale')
+                                            id = 'Righe_@(i)_ComuneElettorale'
+                                                accessibleAutocomplete({
+                                                    element: element,
+                                                    id: id,
+                                                    name: 'Righe[@i].ComuneElettorale',
+                                                    showAllValues: true,
+                                                    source: suggestPR,
+                                                    defaultValue: '@getDescComune(item.CodComuneListaElettorale)',
+                                                    confirmOnBlur: true,
+                                                    autoselect: true,
+                                                    dropdownArrow: () => '',
+                                                    tNoResults: () => 'Comune non trovato',
+                                                    readonly: true,
+                                                    lblby: 'hmElettorale'
+                                                })
+                                        </script>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm-1">
+                                    <input id="Righe_@(i)_NumeroLista" name="Righe[@i].NumeroLista" type="text" class="form-control text-uppercase" maxlength="50" aria-labelledby="hmLista" onkeydown="AnnullaInserimento(event, this);" value="@item.NListaElettorale" @(solaLettura ? "readonly aria-readonly=true" : "")>
+                                </div>
+                                <div class="col-xs-12 col-sm-1">
+                                    @if (solaLettura)
+                                    {
+
+                                        SelectListItem san = Model.CategorieSanabilita.FirstOrDefault(x => x.Value == item.CodCategorieSanabilita);
+                                        string testoSan = san != null ? san.Text : "NESSUNA";
+
+                                        <input id="Righe_@(i)_CategoriaSanabilita" name="Righe[@i].CategoriaSanabilita" type="text" class="form-control text-uppercase" aria-labelledby="hmSanabilita" value="@testoSan" readonly aria-readonly='true'>
+                                    }
+                                    else
+                                    {
+                                        <div class="select-wrapper">
+                                            <select id="Righe_@(i)_CategoriaSanabilita" name="Righe[@i].CategoriaSanabilita" title="" aria-labelledby="hmSanabilita">
+                                                <option label="nessuna" value="" @(string.IsNullOrWhiteSpace(item.CodCategorieSanabilita) ? "selected" : "") data-content="<span class='select-pill'><span class='select-pill-text'></span></span>"></option>
+                                                @foreach (var cat in Model.CategorieSanabilita)
+                                                {
+                                                    <option @(cat.Value == item.CodCategorieSanabilita ? "selected" : "") value="@cat.Value">@cat.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm-2">
+                                    @if (solaLettura)
+                                    {
+
+                                        SelectListItem cat = Model.CategorieNullita.FirstOrDefault(x => x.Value == item.CodCategorieEsclusione);
+                                        string testo = cat != null ? cat.Text : "NESSUNA";
+
+                                        <input id="Righe_@(i)_CategoriaNullita" name="Righe[@i].CategoriaNullita" type="text" class="form-control text-uppercase" aria-labelledby="hmNullita" value="@testo" readonly aria-readonly='true'>
+                                    }
+                                    else
+                                    {
+                                        <div class="select-wrapper">
+                                            <select id="Righe_@(i)_CategoriaNullita" name="Righe[@i].CategoriaNullita" title="" aria-labelledby="hmNullita">
+                                                <option label="nessuna" value="" @(string.IsNullOrWhiteSpace(item.CodCategorieEsclusione) ? "selected" : "") data-content="<span class='select-pill'><span class='select-pill-text'></span></span>"></option>
+                                                @foreach (var cat in Model.CategorieNullita)
+                                                {
+                                                    <option @(cat.Value == item.CodCategorieEsclusione ? "selected" : "") value="@cat.Value">@cat.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-xs-12 col-sm">
+                                    @if (string.IsNullOrWhiteSpace(item.Note))
+                                    {
+                                        <button id="btnNota_@(i)" class="btn btn-link nospinner" data-id="@item.NumeroRiga" onclick='ModificaNota(this);' type="button"><i id="idNotaAssente_@(i)" class="far fa-comment-alt"></i></button>
+                                    }
+                                    else
+                                    {
+                                        <button id="btnNota_@(i)" class="btn btn-link nospinner" title="@item.Note" data-toggle="tooltip" data-id="@item.NumeroRiga" data-nota="@item.Note" onclick='ModificaNota(this);' type="button"><i id="idNotaPresente_@(i)" class="fas fa-comment-alt"></i></button>
+                                    }
+                                    <input type="hidden" id="Righe_@(i)_Note" name="Righe[@i].Note" value="@item.Note">
+                                </div>
+                            </div>
+                            i++;
+                        }
+                    }
+                </div>
+
+
+                if (!solaLettura)
+                {
+                    <br />
+                    <div class="col-12">
+                        @{
+                            string vis = Model.Modulo.IsCompleto ? "hidden" : "unset";
+                        }
+                        <button type="submit" id="btnSalva" class="btn btn-primary" formaction="Salva" title="Salva il modulo" onclick="BloccaTimer();"><i class="far fa-save"></i> Salva</button>
+                        <button type="submit" id="btnSalvaEsci" class="btn btn-default" formaction="SalvaEsci" title="Salva il modulo ed esci" onclick="BloccaTimer();"><i class="far fa-save"></i> Salva ed esci</button>
+                        <button style="visibility:@vis;" type="submit" id="btnCompletaTorna" class="btn btn-default nospinner" formaction="SalvaECompleta" title="Completa il modulo ed esci" onClick="if (confirm(mostraAvvigiGenerici())) { SetOverlay(true); return true; } else { RipartiTimer(); return false;}"><i class="fas fa-sign-out-alt"></i> Completa ed esci</button>
+                        <button style="visibility:@vis;" type="button" id="btnCompletaProsegui" data-toggle="modal" data-target="#modalNuovoModulo" class="btn btn-default" title="Completa e prosegui con un nuovo modulo" onclick="BloccaTimer();"><i class="far fa-save"></i> Completa e prosegui su un nuovo modulo</button>
+                    </div>
+                }
+
+                <div class="it-example-modal">
+                    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modalNuovoModulo" aria-labelledby="modalNuovoModuloTitle">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalNuovoModuloTitle">Nuovo modulo</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Chiudi" onclick="RipartiTimer();">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    @Html.Partial("_partialCreaNuovoModulo", Model)
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-outline-primary btn-sm nospinner" type="submit" formaction="SalvaCompletaEProsegui" title="Salva e avvia la procedura" onClick="return confirm('Sei sicuro di voler procedere con l\'operazione richiesta?')"><i class="far fa-save"></i> Completa e prosegui su un nuovo modulo</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="it-example-modal">
+                    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modalNota" aria-labelledby="modalNotaTitle">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalNotaTitle">Modifica nota</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Chiudi" onclick="RipartiTimer();">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><span id="idSpanNota"></span></p>
+                                    <br />
+                                    <input type="hidden" id="IdProcedimentoNota" name="IdProcedimentoNota" value="@procedimento.ID">
+                                    <input type="hidden" id="IdModuloNota" name="IdModuloNota" value="@Model.Modulo.ID">
+                                    <input type="hidden" id="IdRigaModuloNota" name="IdRigaModuloNota">
+                                    @Html.AgidTextArea("NotaRigaModulo", "Nota", "", id: "idNotaRigaModulo", maxLenght: "256", disabled: solaLettura)
+                                </div>
+                                @if (!solaLettura)
+                                {
+                                    <div class="modal-footer">
+                                        <button class="btn btn-outline-primary btn-sm nospinner" type="button" title="Modifica la nota" onclick="SalvaNota();"><i class="far fa-edit"></i> <span id="spnBtnNota"></span></button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <script>
+
+                function ModificaNota(e) {
+                    BloccaTimer();
+                    var numeroRiga = $(e).data('id');
+                    var notaRiga = $(e).data('nota');
+
+                    try {
+                        $("#modalNota #idSpanNota").text('Modifica la nota per la riga numero ' + numeroRiga + '.');
+                        if (notaRiga == "" || notaRiga == undefined) {
+                            $("#modalNota #spnBtnNota").text('Aggiungi una nota');
+                        }
+                        else {
+                            $("#modalNota #spnBtnNota").text('Modifica la nota');
+                        }
+
+                        $("#modalNota #IdRigaModuloNota").val(numeroRiga);
+                            $("#modalNota #idNotaRigaModulo").val(notaRiga);
+                            $("#modalNota #idNotaRigaModulo").siblings("label").prop("class", "active");
+
+                            $('#modalNota').modal('show');
+                    }
+                    finally { }
+                }
+
+                function SalvaNota() {
+                    BloccaTimer();
+                    try {
+                        var idRiga = $("#modalNota #IdRigaModuloNota").val()-1;
+                        var idModuloRiga = "#Righe_" + idRiga + "_Note";
+                        var notaInserita = $("#modalNota #idNotaRigaModulo").val();
+                        $(idModuloRiga).val(notaInserita);
+
+                        $('#btnNota_' + idRiga).data('nota', notaInserita);
+
+                        /*$('#btnNota_' + idRiga).tooltip({ title: notaInserita });*/
+
+                        $('#btnNota_' + idRiga).tooltip('hide')
+                            .attr('data-original-title', notaInserita)
+                            .tooltip('show');
+
+                        //far assente. fas presente
+
+                        if (notaInserita == "") {
+                            $('#idNotaAssente_' + idRiga).removeClass('fas fa-comment-alt');
+                            $('#idNotaAssente_' + idRiga).addClass('far fa-comment-alt');
+
+                            $('#idNotaPresente_' + idRiga).removeClass('fas fa-comment-alt');
+                            $('#idNotaPresente_' + idRiga).addClass('far fa-comment-alt');
+                        }
+                        else {
+                            $('#idNotaAssente_' + idRiga).removeClass('far fa-comment-alt');
+                            $('#idNotaAssente_' + idRiga).addClass('fas fa-comment-alt');
+
+                            //$('#idNotaPresente_' + idRiga).removeClass('fas fa-comment-alt');
+                            //$('#idNotaPresente_' + idRiga).addClass('far fa-comment-alt');
+
+                        }
+
+
+                        $('#modalNota').modal('hide');
+                    }
+                    finally { RipartiTimer();}
+                }
+
+                @{
+                    string timeOutInfo = $"var intervals = [];var ultimoSalvataggioEseguito;var secondiTime = {Model.MilliSecondiSalvataggioAutomatico}/1000;var myTimeout2 = setInterval(salvataggioTemporizzatoMostraInfo, 1000); intervals.push(myTimeout2);";
+                    if (Model.AbilitaSalvataggioAutomatico && !solaLettura)
+                    {
+                        @timeOutInfo;
+                    }
+                }
+
+                function salvataggioTemporizzato() {
+
+                    try {
+                        var myForm = $("#formCompilazioneModulo").serialize();
+
+                        $.ajax({
+                            type: "POST",
+                            url: "@Url.Action("SalvaAjax", "ControlloAmministrativo")",
+                            data: myForm
+
+                        }).done(function (ret) {
+                            if (ret.includes("|")) {
+                                var righe = ret.split("|");
+                                var numeroRigheCompletate = righe[1];
+                                var isCompleto = righe[2];
+                                ret = "OK"
+
+                                if (isCompleto == "1") {
+                                    $('#btnCompletaTorna').css("visibility", "hidden");
+                                    $('#btnCompletaProsegui').css("visibility", "hidden");
+                                    $('#divModuloConcluso').css("display", "block");
+
+                                }
+                                else {
+                                    $('#btnCompletaTorna').css("visibility", "unset");
+                                    $('#btnCompletaProsegui').css("visibility", "unset");
+                                    $('#divModuloConcluso').css("display", "none");
+                                }
+
+                                $("#NrNominativiOperazioni").attr({
+                                    "max": @Model.NumeroMaxRigheModulo,
+                                    "min": numeroRigheCompletate
+                                });
+                            }
+                            switch (ret) {
+                                case "OK":
+                                    // salvataggio automatico riuscito
+                                    myTimeout2 = setInterval(salvataggioTemporizzatoMostraInfo, 1000);
+                                    intervals.push(myTimeout2);
+                                    $('#divAlertSalvataggioTemp').hide();
+                                    var dt = new Date();
+                                    var time = dt.getHours() + ":" + (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
+                                    ultimoSalvataggioEseguito = time;
+                                    SbloccaPulsanti();
+                                    break;
+                                default:
+                                    // errore generico
+                                    myTimeout2 = setInterval(salvataggioTemporizzatoMostraInfo, 1000);
+                                    intervals.push(myTimeout2);
+                                    $('#divAlertSalvataggioTemp').show();
+                                    SbloccaPulsanti();
+                                    console.error(ret);
+                            }
+                        })
+                            .fail(function (ret) {
+                                myTimeout2 = setInterval(salvataggioTemporizzatoMostraInfo, 1000);
+                                intervals.push(myTimeout2);
+                                $('#divAlertSalvataggioTemp').show();
+                                SbloccaPulsanti();
+                                console.error(ret);
+                            })
+
+                            ;
+                    } catch (err) {
+                        myTimeout2 = setInterval(salvataggioTemporizzatoMostraInfo, 1000);
+                        intervals.push(myTimeout2);
+                        $('#divAlertSalvataggioTemp').show();
+                        SbloccaPulsanti();
+                        console.error(err);
+                    }
+                }
+
+                function salvataggioTemporizzatoMostraInfo() {
+                    try {
+                            secondiTime = secondiTime - 1;
+
+                        if (secondiTime <= 0) {
+                            BloccaPulsanti();
+                                $("#TempoSalvataggio").text("Salvataggio in corso...");
+                                intervals.forEach(clearInterval);
+                                secondiTime = @Model.MilliSecondiSalvataggioAutomatico;
+                                secondiTime = secondiTime / 1000;
+                                salvataggioTemporizzato(); //salvo
+                            }
+                            else {
+                               if (ultimoSalvataggioEseguito === undefined) {
+                                var numtotSeco =  @Model.MilliSecondiSalvataggioAutomatico;
+                                numtotSeco = numtotSeco / 1000;
+                                numtotSeco = numtotSeco - 1;
+                                if (secondiTime == numtotSeco) {
+                                    $("#TempoSalvataggio").text("Mancano " + secondiTime + " secondi al salvataggio automatico...");
+                                }
+                                else {
+                                        if (secondiTime % 10 == 0) {
+                                            $("#TempoSalvataggio").text("Mancano " + secondiTime + " secondi al salvataggio automatico...");
+                                        }
+                                    }
+                                }
+                            else {
+                                    if (secondiTime % 10 == 0) {
+                                        $("#TempoSalvataggio").text("Mancano " + secondiTime + " secondi al salvataggio automatico. Ultimo salvataggio eseguito alle ore " + ultimoSalvataggioEseguito);
+                                    }
+                                }
+                            }
+
+
+                    } catch (err) {
+                        console.error(err);
+                        SbloccaPulsanti();
+                    }
+                }
+
+                function play() {
+                    var audio = new Audio('../Content/beep.mp3');
+                    audio.play();
+                }
+
+
+                function formattaData(e, input) {
+                    const pattern = /^[0-3][0-9][\s?\/?\-?]*[0-1][0-9][\s?\/?\-?]*(\d{4}|\d{2}$)/;
+                    var text = input.value;
+                    var selettoreHidden = input.id.replace('String', '');
+                    var annoLimite = @(procedimento.AnnoFirmatario);
+
+                    $(('#' + input.id)).removeClass('is-invalid');
+                    $(('#' + input.id)).removeAttr('aria-invalid');
+
+                    if (pattern.test(text) === true) {
+                        var text2 = text.replaceAll('/', '').replaceAll('-', '').replaceAll(' ', '');
+
+                        var componenti;
+                        if (text2.length == 6) {
+                            // hanno inserito una data con sole due cifre per l'anno. Va calcolato quindi se è una data del 2000 o del 1900
+                            componenti = [text2.substring(0, 2), text2.substring(2, 4), text2.substring(4, 6)];
+
+                            var annoTextBox = parseInt(componenti[2]);
+
+                            if ((annoTextBox + 2000) > annoLimite) {
+                                componenti[2] = '' + (annoTextBox + 1900);
+                            }
+                            else {
+                                componenti[2] = '' + (annoTextBox + 2000);
+                            }
+                        }
+                        else if (text2.length == 8) {
+                            // hanno inserito una data completa, non serve fare nulla
+                            componenti = [text2.substring(0, 2), text2.substring(2, 4), text2.substring(4, 8)];
+                        }
+                        else {
+                            // valore non valido
+                            input.value = '';
+                            document.getElementById(selettoreHidden).value = '';
+                            $(('#' + input.id)).addClass('is-invalid');
+                            $(('#' + input.id)).attr('aria-invalid', 'true');
+                            //play();
+                        }
+
+                        // anno maggiore di 1900 e minore dell'anno limite
+                        // giorno con valore tra 1 e 31
+                        // mese con valore tra 1 e 12
+                        if ((parseInt(componenti[0]) <= 31 && parseInt(componenti[0]) >= 1) &&
+                            (parseInt(componenti[1]) <= 12 && parseInt(componenti[1]) >= 1) &&
+                            (/*parseInt(componenti[2]) <= annoLimite && */parseInt(componenti[2]) >= 1900) &&
+                            VerificaDataValida(componenti)) {
+                            // tutto valido, metto tutto nella textbox e nel campo hidden
+                            input.value = componenti[0] + '/' + componenti[1] + '/' + componenti[2];
+                            document.getElementById(selettoreHidden).value = componenti[2] + '-' + componenti[1] + '-' + componenti[0];
+                            $(('#' + input.id)).removeClass('is-invalid');
+                            $(('#' + input.id)).attr('aria-invalid', 'false');
+                        }
+                        else {
+                            // valore non valido
+                            input.value = '';
+                            document.getElementById(selettoreHidden).value = '';
+                            $(('#' + input.id)).addClass('is-invalid');
+                            $(('#' + input.id)).attr('aria-invalid', 'true');
+
+                            //play();
+                        }
+                    }
+                    else if(text != '')
+                    {
+                        input.value = '';
+                        document.getElementById(selettoreHidden).value = '';
+                        $(('#' + input.id)).addClass('is-invalid');
+                        $(('#' + input.id)).attr('aria-invalid', 'true');
+                        //play();
+                    }
+                    else if (text == '') {
+                        input.value = '';
+                        document.getElementById(selettoreHidden).value = '';
+                        $(('#' + input.id)).removeClass('is-invalid');
+                        $(('#' + input.id)).attr('aria-invalid', 'false');
+                    }
+                }
+
+                function VerificaDataValida(componenti) {
+                    var giorno = parseInt(componenti[0]);
+                    var mese = parseInt(componenti[1]);
+                    var anno = parseInt(componenti[2]);
+
+                    if ((mese == 4 || mese == 6 || mese == 9 || mese == 11) && giorno >= 31) {
+                        return false;
+                    }
+
+                    if (mese == 2) {
+                        if (((anno % 4 == 0) && (anno % 100 != 0)) || (anno % 400 == 0)) {
+                            if (giorno >= 30) {
+                                return false;
+                            }
+                        }
+                        else {
+                            if (giorno >= 29) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    var oggi = new Date();
+                    var meseOggi = oggi.getUTCMonth() + 1;
+                    var giornoOggi = oggi.getUTCDate();
+                    var annoOggi = oggi.getUTCFullYear();
+
+                    if (anno > annoOggi) {
+                        return false;
+                    }
+
+                    if (anno == annoOggi) {
+                        if (mese > meseOggi) {
+                            return false;
+                        }
+
+                        if (mese == meseOggi) {
+                            if (giorno > giornoOggi) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                    }
+
+                    function AnnullaInserimento(evt, input) {
+                        var code = evt.charCode || evt.keyCode;
+                        if (code == 27) {
+                            input.value = input.defaultValue;
+                        }
+                }
+
+
+                function BloccaTimer() {
+
+                     @{
+                        string blocca = $"intervals.forEach(clearInterval);";
+                        if (Model.AbilitaSalvataggioAutomatico && !solaLettura)
+                        {
+                            @blocca;
+                        }
+                      }
+                }
+
+                 function RipartiTimer() {
+
+                     @{
+                        string sblocca = $"var myTimeout2r = setInterval(salvataggioTemporizzatoMostraInfo, 1000); intervals.push(myTimeout2r); return false;";
+                        if (Model.AbilitaSalvataggioAutomatico && !solaLettura)
+                        {
+                            @sblocca;
+                        }
+                      }
+                }
+
+                function BloccaPulsanti() {
+                    $('#btnSalvaModulo').attr('disabled', 'disabled');
+                    $('#btnSalva').attr('disabled', 'disabled');
+                    $('#btnSalvaEsci').attr('disabled', 'disabled');
+                    $('#btnCompletaTorna').attr('disabled', 'disabled');
+                    $('#btnCompletaProsegui').attr('disabled', 'disabled');
+                }
+
+                function SbloccaPulsanti() {
+                    $('#btnSalvaModulo').removeAttr('disabled');
+                    $('#btnSalva').removeAttr('disabled');
+                    $('#btnSalvaEsci').removeAttr('disabled');
+                    $('#btnCompletaTorna').removeAttr('disabled');
+                    $('#btnCompletaProsegui').removeAttr('disabled');
+                }
+            </script>
+        </div>
+    </div>
+</div>

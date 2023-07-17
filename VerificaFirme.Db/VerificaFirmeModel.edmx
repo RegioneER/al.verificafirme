@@ -1,0 +1,1197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="VerificaFirmeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CategorieEsclusione">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="DescrizioneBreve" Type="varchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CategorieSanabilita">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="DescrizioneBreve" Type="varchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Comuni">
+          <Key>
+            <PropertyRef Name="cod_istat" />
+          </Key>
+          <Property Name="cod_reg" Type="varchar" MaxLength="2" />
+          <Property Name="cod_istat" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="sigla_prov" Type="varchar" MaxLength="2" />
+          <Property Name="des_com" Type="varchar" MaxLength="45" />
+        </EntityType>
+        <EntityType Name="Modulo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDProcedimento" Type="int" Nullable="false" />
+          <Property Name="CodicePostazione" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Numero" Type="int" Nullable="false" />
+          <Property Name="IsNullo" Type="bit" Nullable="false" />
+          <Property Name="NumeroRighe" Type="int" Nullable="false" />
+          <Property Name="CodComuneListaElettorale" Type="varchar" MaxLength="6" />
+          <Property Name="CodCategoriaEsclusione" Type="varchar" MaxLength="3" />
+          <Property Name="IsCompleto" Type="bit" Nullable="false" />
+          <Property Name="UsernameCreazione" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DataOraCreazione" Type="datetime" Nullable="false" />
+          <Property Name="UsernameModifica" Type="varchar" MaxLength="50" />
+          <Property Name="DataOraModifica" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ModuloNominativo">
+          <Key>
+            <PropertyRef Name="IDModulo" />
+            <PropertyRef Name="NumeroRiga" />
+          </Key>
+          <Property Name="IDModulo" Type="int" Nullable="false" />
+          <Property Name="NumeroRiga" Type="int" Nullable="false" />
+          <Property Name="Nome" Type="nvarchar" MaxLength="100" />
+          <Property Name="Cognome" Type="nvarchar" MaxLength="100" />
+          <Property Name="DataNascita" Type="date" />
+          <Property Name="CodComuneNascita" Type="varchar" MaxLength="6" />
+          <Property Name="CodComuneListaElettorale" Type="varchar" MaxLength="6" />
+          <Property Name="NListaElettorale" Type="nvarchar" MaxLength="50" />
+          <Property Name="CodCategorieEsclusione" Type="varchar" MaxLength="3" />
+          <Property Name="CodCategorieSanabilita" Type="varchar" MaxLength="3" />
+          <Property Name="Note" Type="nvarchar" MaxLength="256" />
+        </EntityType>
+        <EntityType Name="ModuloNominativoLog">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDModuloNominativo" Type="int" Nullable="false" />
+          <Property Name="NumeroRiga" Type="int" Nullable="false" />
+          <Property Name="Username" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DataOraModifica" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Parametri">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Valore" Type="varchar" MaxLength="250" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Procedimento">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CodStato" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Descrizione" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="QuorumFirme" Type="int" Nullable="false" />
+          <Property Name="NumeroPostazioni" Type="int" Nullable="false" />
+          <Property Name="NumeroModuli" Type="int" Nullable="false" />
+          <Property Name="AnnoFirmatario" Type="int" Nullable="false" />
+          <Property Name="UsernameCreazione" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DataOraCreazione" Type="datetime" Nullable="false" />
+          <Property Name="UsernameModifica" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="DataOraModifica" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProcedimentoPostazione">
+          <Key>
+            <PropertyRef Name="IDProcedimento" />
+            <PropertyRef Name="CodicePostazione" />
+          </Key>
+          <Property Name="IDProcedimento" Type="int" Nullable="false" />
+          <Property Name="CodicePostazione" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="ModuloDa" Type="int" Nullable="false" />
+          <Property Name="ModuloA" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Profilo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Province">
+          <Key>
+            <PropertyRef Name="cod_prov" />
+          </Key>
+          <Property Name="cod_reg" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="cod_prov" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="sigla_prov" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="des_prov" Type="varchar" MaxLength="22" Nullable="false" />
+          <Property Name="des_reg" Type="varchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Regioni">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Stato">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="Descrizione" Type="varchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Utente">
+          <Key>
+            <PropertyRef Name="Username" />
+          </Key>
+          <Property Name="Username" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Nome" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Cognome" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Email" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="IsAttivo" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UtenteProcedimento">
+          <Key>
+            <PropertyRef Name="Username" />
+            <PropertyRef Name="IDProcedimento" />
+          </Key>
+          <Property Name="Username" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="IDProcedimento" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UtenteProfilo">
+          <Key>
+            <PropertyRef Name="Username" />
+            <PropertyRef Name="IDProfilo" />
+            <PropertyRef Name="ValidoDal" />
+          </Key>
+          <Property Name="Username" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="IDProfilo" Type="int" Nullable="false" />
+          <Property Name="ValidoDal" Type="datetime" Nullable="false" />
+          <Property Name="ValidoAl" Type="datetime" />
+        </EntityType>
+        <!--Errori trovati durante la generazione:
+avviso 6002: Nessuna chiave primaria definita per la tabella/visualizzazione 'VerificaFirme.dbo.vvComune'. La chiave è stata dedotta e la definizione è stata creata come tabella/visualizzazione di sola lettura.-->
+        <EntityType Name="vvComune">
+          <Key>
+            <PropertyRef Name="cod_istat" />
+          </Key>
+          <Property Name="cod_reg" Type="varchar" MaxLength="2" />
+          <Property Name="cod_istat" Type="varchar" MaxLength="6" Nullable="false" />
+          <Property Name="sigla_prov" Type="varchar" MaxLength="2" />
+          <Property Name="des_com" Type="varchar" MaxLength="45" />
+          <Property Name="DescrizioneCompleta" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <!--Errori trovati durante la generazione:
+avviso 6002: Nessuna chiave primaria definita per la tabella/visualizzazione 'VerificaFirme.dbo.vvProvincia'. La chiave è stata dedotta e la definizione è stata creata come tabella/visualizzazione di sola lettura.-->
+        <EntityType Name="vvProvincia">
+          <Key>
+            <PropertyRef Name="cod_reg" />
+            <PropertyRef Name="cod_prov" />
+            <PropertyRef Name="sigla_prov" />
+            <PropertyRef Name="des_prov" />
+            <PropertyRef Name="des_reg" />
+          </Key>
+          <Property Name="cod_reg" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="cod_prov" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="sigla_prov" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="des_prov" Type="varchar" MaxLength="22" Nullable="false" />
+          <Property Name="des_reg" Type="varchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Modulo_CategorieEsclusione">
+          <End Role="CategorieEsclusione" Type="Self.CategorieEsclusione" Multiplicity="0..1" />
+          <End Role="Modulo" Type="Self.Modulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieEsclusione">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="Modulo">
+              <PropertyRef Name="CodCategoriaEsclusione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Modulo_ProcedimentoPostazione">
+          <End Role="ProcedimentoPostazione" Type="Self.ProcedimentoPostazione" Multiplicity="1" />
+          <End Role="Modulo" Type="Self.Modulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProcedimentoPostazione">
+              <PropertyRef Name="IDProcedimento" />
+              <PropertyRef Name="CodicePostazione" />
+            </Principal>
+            <Dependent Role="Modulo">
+              <PropertyRef Name="IDProcedimento" />
+              <PropertyRef Name="CodicePostazione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_CategorieEsclusione">
+          <End Role="CategorieEsclusione" Type="Self.CategorieEsclusione" Multiplicity="0..1" />
+          <End Role="ModuloNominativo" Type="Self.ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieEsclusione">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="CodCategorieEsclusione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_CategorieSanabilita">
+          <End Role="CategorieSanabilita" Type="Self.CategorieSanabilita" Multiplicity="0..1" />
+          <End Role="ModuloNominativo" Type="Self.ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieSanabilita">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="CodCategorieSanabilita" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_Modulo">
+          <End Role="Modulo" Type="Self.Modulo" Multiplicity="1" />
+          <End Role="ModuloNominativo" Type="Self.ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulo">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="IDModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativoLog_ModuloNominativo">
+          <End Role="ModuloNominativo" Type="Self.ModuloNominativo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ModuloNominativoLog" Type="Self.ModuloNominativoLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ModuloNominativo">
+              <PropertyRef Name="IDModulo" />
+              <PropertyRef Name="NumeroRiga" />
+            </Principal>
+            <Dependent Role="ModuloNominativoLog">
+              <PropertyRef Name="IDModuloNominativo" />
+              <PropertyRef Name="NumeroRiga" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Procedimento_Stato">
+          <End Role="Stato" Type="Self.Stato" Multiplicity="1" />
+          <End Role="Procedimento" Type="Self.Procedimento" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stato">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="Procedimento">
+              <PropertyRef Name="CodStato" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcedimentoPostazione_Procedimento">
+          <End Role="Procedimento" Type="Self.Procedimento" Multiplicity="1" />
+          <End Role="ProcedimentoPostazione" Type="Self.ProcedimentoPostazione" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Procedimento">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ProcedimentoPostazione">
+              <PropertyRef Name="IDProcedimento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProcedimento_Procedimento">
+          <End Role="Procedimento" Type="Self.Procedimento" Multiplicity="1" />
+          <End Role="UtenteProcedimento" Type="Self.UtenteProcedimento" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Procedimento">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="UtenteProcedimento">
+              <PropertyRef Name="IDProcedimento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProcedimento_Utente">
+          <End Role="Utente" Type="Self.Utente" Multiplicity="1" />
+          <End Role="UtenteProcedimento" Type="Self.UtenteProcedimento" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Utente">
+              <PropertyRef Name="Username" />
+            </Principal>
+            <Dependent Role="UtenteProcedimento">
+              <PropertyRef Name="Username" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProfilo_Profilo">
+          <End Role="Profilo" Type="Self.Profilo" Multiplicity="1" />
+          <End Role="UtenteProfilo" Type="Self.UtenteProfilo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Profilo">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="UtenteProfilo">
+              <PropertyRef Name="IDProfilo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProfilo_Utente">
+          <End Role="Utente" Type="Self.Utente" Multiplicity="1" />
+          <End Role="UtenteProfilo" Type="Self.UtenteProfilo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Utente">
+              <PropertyRef Name="Username" />
+            </Principal>
+            <Dependent Role="UtenteProfilo">
+              <PropertyRef Name="Username" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="fnModulo_Stato" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="varchar">
+          <Parameter Name="IDModulo" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Procedimento_Elimina" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IdProcedimento" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Report_NominativiDuplicatiPerProcedimento" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IdProcedimento" Type="int" Mode="In" />
+          <Parameter Name="CodComuneNascita" Type="varchar" Mode="In" />
+          <Parameter Name="CodComuneListaElettorale" Type="varchar" Mode="In" />
+          <Parameter Name="AncheEsclusi" Type="bit" Mode="In" />
+        </Function>
+        <Function Name="Report_RiepilogoDataEntry" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IdProcedimento" Type="int" Mode="In" />
+          <Parameter Name="TipoRaggruppamento" Type="int" Mode="In" />
+        </Function>
+        <Function Name="Report_VerificaMinori" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="IdProcedimento" Type="int" Mode="In" />
+          <Parameter Name="DataRiferimento" Type="date" Mode="In" />
+        </Function>
+        <EntityContainer Name="VerificaFirmeModelStoreContainer">
+          <EntitySet Name="CategorieEsclusione" EntityType="Self.CategorieEsclusione" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CategorieSanabilita" EntityType="Self.CategorieSanabilita" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comuni" EntityType="Self.Comuni" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Modulo" EntityType="Self.Modulo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ModuloNominativo" EntityType="Self.ModuloNominativo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ModuloNominativoLog" EntityType="Self.ModuloNominativoLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Parametri" EntityType="Self.Parametri" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Procedimento" EntityType="Self.Procedimento" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProcedimentoPostazione" EntityType="Self.ProcedimentoPostazione" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Profilo" EntityType="Self.Profilo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Province" EntityType="Self.Province" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Regioni" EntityType="Self.Regioni" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Stato" EntityType="Self.Stato" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Utente" EntityType="Self.Utente" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UtenteProcedimento" EntityType="Self.UtenteProcedimento" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UtenteProfilo" EntityType="Self.UtenteProfilo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vvComune" EntityType="Self.vvComune" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vvComune].[cod_reg] AS [cod_reg], 
+    [vvComune].[cod_istat] AS [cod_istat], 
+    [vvComune].[sigla_prov] AS [sigla_prov], 
+    [vvComune].[des_com] AS [des_com], 
+    [vvComune].[DescrizioneCompleta] AS [DescrizioneCompleta]
+    FROM [dbo].[vvComune] AS [vvComune]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vvProvincia" EntityType="Self.vvProvincia" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vvProvincia].[cod_reg] AS [cod_reg], 
+    [vvProvincia].[cod_prov] AS [cod_prov], 
+    [vvProvincia].[sigla_prov] AS [sigla_prov], 
+    [vvProvincia].[des_prov] AS [des_prov], 
+    [vvProvincia].[des_reg] AS [des_reg]
+    FROM [dbo].[vvProvincia] AS [vvProvincia]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Modulo_CategorieEsclusione" Association="Self.FK_Modulo_CategorieEsclusione">
+            <End Role="CategorieEsclusione" EntitySet="CategorieEsclusione" />
+            <End Role="Modulo" EntitySet="Modulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Modulo_ProcedimentoPostazione" Association="Self.FK_Modulo_ProcedimentoPostazione">
+            <End Role="ProcedimentoPostazione" EntitySet="ProcedimentoPostazione" />
+            <End Role="Modulo" EntitySet="Modulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_CategorieEsclusione" Association="Self.FK_ModuloNominativo_CategorieEsclusione">
+            <End Role="CategorieEsclusione" EntitySet="CategorieEsclusione" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_CategorieSanabilita" Association="Self.FK_ModuloNominativo_CategorieSanabilita">
+            <End Role="CategorieSanabilita" EntitySet="CategorieSanabilita" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_Modulo" Association="Self.FK_ModuloNominativo_Modulo">
+            <End Role="Modulo" EntitySet="Modulo" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativoLog_ModuloNominativo" Association="Self.FK_ModuloNominativoLog_ModuloNominativo">
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+            <End Role="ModuloNominativoLog" EntitySet="ModuloNominativoLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Procedimento_Stato" Association="Self.FK_Procedimento_Stato">
+            <End Role="Stato" EntitySet="Stato" />
+            <End Role="Procedimento" EntitySet="Procedimento" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcedimentoPostazione_Procedimento" Association="Self.FK_ProcedimentoPostazione_Procedimento">
+            <End Role="Procedimento" EntitySet="Procedimento" />
+            <End Role="ProcedimentoPostazione" EntitySet="ProcedimentoPostazione" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProcedimento_Procedimento" Association="Self.FK_UtenteProcedimento_Procedimento">
+            <End Role="Procedimento" EntitySet="Procedimento" />
+            <End Role="UtenteProcedimento" EntitySet="UtenteProcedimento" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProcedimento_Utente" Association="Self.FK_UtenteProcedimento_Utente">
+            <End Role="Utente" EntitySet="Utente" />
+            <End Role="UtenteProcedimento" EntitySet="UtenteProcedimento" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProfilo_Profilo" Association="Self.FK_UtenteProfilo_Profilo">
+            <End Role="Profilo" EntitySet="Profilo" />
+            <End Role="UtenteProfilo" EntitySet="UtenteProfilo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProfilo_Utente" Association="Self.FK_UtenteProfilo_Utente">
+            <End Role="Utente" EntitySet="Utente" />
+            <End Role="UtenteProfilo" EntitySet="UtenteProfilo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="VerificaFirmeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="VerificaFirmeEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CategorieEsclusione" EntityType="VerificaFirmeModel.CategorieEsclusione" />
+          <EntitySet Name="CategorieSanabilita" EntityType="VerificaFirmeModel.CategorieSanabilita" />
+          <EntitySet Name="Comuni" EntityType="VerificaFirmeModel.Comuni" />
+          <EntitySet Name="Modulo" EntityType="VerificaFirmeModel.Modulo" />
+          <EntitySet Name="ModuloNominativo" EntityType="VerificaFirmeModel.ModuloNominativo" />
+          <EntitySet Name="ModuloNominativoLog" EntityType="VerificaFirmeModel.ModuloNominativoLog" />
+          <EntitySet Name="Parametri" EntityType="VerificaFirmeModel.Parametri" />
+          <EntitySet Name="Procedimento" EntityType="VerificaFirmeModel.Procedimento" />
+          <EntitySet Name="ProcedimentoPostazione" EntityType="VerificaFirmeModel.ProcedimentoPostazione" />
+          <EntitySet Name="Profilo" EntityType="VerificaFirmeModel.Profilo" />
+          <EntitySet Name="Province" EntityType="VerificaFirmeModel.Province" />
+          <EntitySet Name="Regioni" EntityType="VerificaFirmeModel.Regioni" />
+          <EntitySet Name="Stato" EntityType="VerificaFirmeModel.Stato" />
+          <EntitySet Name="Utente" EntityType="VerificaFirmeModel.Utente" />
+          <EntitySet Name="UtenteProfilo" EntityType="VerificaFirmeModel.UtenteProfilo" />
+          <EntitySet Name="vvComune" EntityType="VerificaFirmeModel.vvComune" />
+          <EntitySet Name="vvProvincia" EntityType="VerificaFirmeModel.vvProvincia" />
+          <AssociationSet Name="FK_Modulo_CategorieEsclusione" Association="VerificaFirmeModel.FK_Modulo_CategorieEsclusione">
+            <End Role="CategorieEsclusione" EntitySet="CategorieEsclusione" />
+            <End Role="Modulo" EntitySet="Modulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_CategorieEsclusione" Association="VerificaFirmeModel.FK_ModuloNominativo_CategorieEsclusione">
+            <End Role="CategorieEsclusione" EntitySet="CategorieEsclusione" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_CategorieSanabilita" Association="VerificaFirmeModel.FK_ModuloNominativo_CategorieSanabilita">
+            <End Role="CategorieSanabilita" EntitySet="CategorieSanabilita" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Modulo_ProcedimentoPostazione" Association="VerificaFirmeModel.FK_Modulo_ProcedimentoPostazione">
+            <End Role="ProcedimentoPostazione" EntitySet="ProcedimentoPostazione" />
+            <End Role="Modulo" EntitySet="Modulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativo_Modulo" Association="VerificaFirmeModel.FK_ModuloNominativo_Modulo">
+            <End Role="Modulo" EntitySet="Modulo" />
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ModuloNominativoLog_ModuloNominativo" Association="VerificaFirmeModel.FK_ModuloNominativoLog_ModuloNominativo">
+            <End Role="ModuloNominativo" EntitySet="ModuloNominativo" />
+            <End Role="ModuloNominativoLog" EntitySet="ModuloNominativoLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Procedimento_Stato" Association="VerificaFirmeModel.FK_Procedimento_Stato">
+            <End Role="Stato" EntitySet="Stato" />
+            <End Role="Procedimento" EntitySet="Procedimento" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ProcedimentoPostazione_Procedimento" Association="VerificaFirmeModel.FK_ProcedimentoPostazione_Procedimento">
+            <End Role="Procedimento" EntitySet="Procedimento" />
+            <End Role="ProcedimentoPostazione" EntitySet="ProcedimentoPostazione" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProfilo_Profilo" Association="VerificaFirmeModel.FK_UtenteProfilo_Profilo">
+            <End Role="Profilo" EntitySet="Profilo" />
+            <End Role="UtenteProfilo" EntitySet="UtenteProfilo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UtenteProfilo_Utente" Association="VerificaFirmeModel.FK_UtenteProfilo_Utente">
+            <End Role="Utente" EntitySet="Utente" />
+            <End Role="UtenteProfilo" EntitySet="UtenteProfilo" />
+          </AssociationSet>
+          <AssociationSet Name="UtenteProcedimento" Association="VerificaFirmeModel.UtenteProcedimento">
+            <End Role="Procedimento" EntitySet="Procedimento" />
+            <End Role="Utente" EntitySet="Utente" />
+          </AssociationSet>
+          <FunctionImport Name="Procedimento_Elimina">
+            <Parameter Name="IdProcedimento" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Report_NominativiDuplicatiPerProcedimento" ReturnType="Collection(VerificaFirmeModel.Report_NominativiDuplicatiPerProcedimento_Result)">
+            <Parameter Name="IdProcedimento" Mode="In" Type="Int32" />
+            <Parameter Name="CodComuneNascita" Mode="In" Type="String" />
+            <Parameter Name="CodComuneListaElettorale" Mode="In" Type="String" />
+            <Parameter Name="AncheEsclusi" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="Report_RiepilogoDataEntry" ReturnType="Collection(VerificaFirmeModel.Report_RiepilogoDataEntry_Result)">
+            <Parameter Name="IdProcedimento" Mode="In" Type="Int32" />
+            <Parameter Name="TipoRaggruppamento" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="Report_VerificaMinori" ReturnType="Collection(VerificaFirmeModel.Report_VerificaMinori_Result)">
+            <Parameter Name="IdProcedimento" Mode="In" Type="Int32" />
+            <Parameter Name="DataRiferimento" Mode="In" Type="DateTime" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="CategorieEsclusione">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="DescrizioneBreve" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Modulo" Relationship="VerificaFirmeModel.FK_Modulo_CategorieEsclusione" FromRole="CategorieEsclusione" ToRole="Modulo" />
+          <NavigationProperty Name="ModuloNominativo" Relationship="VerificaFirmeModel.FK_ModuloNominativo_CategorieEsclusione" FromRole="CategorieEsclusione" ToRole="ModuloNominativo" />
+        </EntityType>
+        <EntityType Name="CategorieSanabilita">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="DescrizioneBreve" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ModuloNominativo" Relationship="VerificaFirmeModel.FK_ModuloNominativo_CategorieSanabilita" FromRole="CategorieSanabilita" ToRole="ModuloNominativo" />
+        </EntityType>
+        <EntityType Name="Comuni">
+          <Key>
+            <PropertyRef Name="cod_istat" />
+          </Key>
+          <Property Name="cod_reg" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="cod_istat" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="sigla_prov" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="des_com" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Modulo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDProcedimento" Type="Int32" Nullable="false" />
+          <Property Name="CodicePostazione" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Numero" Type="Int32" Nullable="false" />
+          <Property Name="IsNullo" Type="Boolean" Nullable="false" />
+          <Property Name="NumeroRighe" Type="Int32" Nullable="false" />
+          <Property Name="CodComuneListaElettorale" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="CodCategoriaEsclusione" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="IsCompleto" Type="Boolean" Nullable="false" />
+          <Property Name="UsernameCreazione" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DataOraCreazione" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UsernameModifica" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DataOraModifica" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="CategorieEsclusione" Relationship="VerificaFirmeModel.FK_Modulo_CategorieEsclusione" FromRole="Modulo" ToRole="CategorieEsclusione" />
+          <NavigationProperty Name="ProcedimentoPostazione" Relationship="VerificaFirmeModel.FK_Modulo_ProcedimentoPostazione" FromRole="Modulo" ToRole="ProcedimentoPostazione" />
+          <NavigationProperty Name="ModuloNominativo" Relationship="VerificaFirmeModel.FK_ModuloNominativo_Modulo" FromRole="Modulo" ToRole="ModuloNominativo" />
+        </EntityType>
+        <EntityType Name="ModuloNominativo">
+          <Key>
+            <PropertyRef Name="IDModulo" />
+            <PropertyRef Name="NumeroRiga" />
+          </Key>
+          <Property Name="IDModulo" Type="Int32" Nullable="false" />
+          <Property Name="NumeroRiga" Type="Int32" Nullable="false" />
+          <Property Name="Nome" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Cognome" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="DataNascita" Type="DateTime" Precision="0" />
+          <Property Name="CodComuneNascita" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="CodComuneListaElettorale" Type="String" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="NListaElettorale" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CodCategorieEsclusione" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="CodCategorieSanabilita" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Note" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="CategorieEsclusione" Relationship="VerificaFirmeModel.FK_ModuloNominativo_CategorieEsclusione" FromRole="ModuloNominativo" ToRole="CategorieEsclusione" />
+          <NavigationProperty Name="CategorieSanabilita" Relationship="VerificaFirmeModel.FK_ModuloNominativo_CategorieSanabilita" FromRole="ModuloNominativo" ToRole="CategorieSanabilita" />
+          <NavigationProperty Name="Modulo" Relationship="VerificaFirmeModel.FK_ModuloNominativo_Modulo" FromRole="ModuloNominativo" ToRole="Modulo" />
+          <NavigationProperty Name="ModuloNominativoLog" Relationship="VerificaFirmeModel.FK_ModuloNominativoLog_ModuloNominativo" FromRole="ModuloNominativo" ToRole="ModuloNominativoLog" />
+        </EntityType>
+        <EntityType Name="ModuloNominativoLog">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDModuloNominativo" Type="Int32" Nullable="false" />
+          <Property Name="NumeroRiga" Type="Int32" Nullable="false" />
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DataOraModifica" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="ModuloNominativo" Relationship="VerificaFirmeModel.FK_ModuloNominativoLog_ModuloNominativo" FromRole="ModuloNominativoLog" ToRole="ModuloNominativo" />
+        </EntityType>
+        <EntityType Name="Parametri">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Valore" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Procedimento">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CodStato" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="QuorumFirme" Type="Int32" Nullable="false" />
+          <Property Name="NumeroPostazioni" Type="Int32" Nullable="false" />
+          <Property Name="NumeroModuli" Type="Int32" Nullable="false" />
+          <Property Name="AnnoFirmatario" Type="Int32" Nullable="false" />
+          <Property Name="UsernameCreazione" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DataOraCreazione" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UsernameModifica" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DataOraModifica" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Stato" Relationship="VerificaFirmeModel.FK_Procedimento_Stato" FromRole="Procedimento" ToRole="Stato" />
+          <NavigationProperty Name="ProcedimentoPostazione" Relationship="VerificaFirmeModel.FK_ProcedimentoPostazione_Procedimento" FromRole="Procedimento" ToRole="ProcedimentoPostazione" />
+          <NavigationProperty Name="Utente" Relationship="VerificaFirmeModel.UtenteProcedimento" FromRole="Procedimento" ToRole="Utente" />
+        </EntityType>
+        <EntityType Name="ProcedimentoPostazione">
+          <Key>
+            <PropertyRef Name="IDProcedimento" />
+            <PropertyRef Name="CodicePostazione" />
+          </Key>
+          <Property Name="IDProcedimento" Type="Int32" Nullable="false" />
+          <Property Name="CodicePostazione" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="ModuloDa" Type="Int32" Nullable="false" />
+          <Property Name="ModuloA" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Modulo" Relationship="VerificaFirmeModel.FK_Modulo_ProcedimentoPostazione" FromRole="ProcedimentoPostazione" ToRole="Modulo" />
+          <NavigationProperty Name="Procedimento" Relationship="VerificaFirmeModel.FK_ProcedimentoPostazione_Procedimento" FromRole="ProcedimentoPostazione" ToRole="Procedimento" />
+        </EntityType>
+        <EntityType Name="Profilo">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Descrizione" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="UtenteProfilo" Relationship="VerificaFirmeModel.FK_UtenteProfilo_Profilo" FromRole="Profilo" ToRole="UtenteProfilo" />
+        </EntityType>
+        <EntityType Name="Province">
+          <Key>
+            <PropertyRef Name="cod_prov" />
+          </Key>
+          <Property Name="cod_reg" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="cod_prov" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="sigla_prov" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="des_prov" Type="String" Nullable="false" MaxLength="22" FixedLength="false" Unicode="false" />
+          <Property Name="des_reg" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Regioni">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Stato">
+          <Key>
+            <PropertyRef Name="Cod" />
+          </Key>
+          <Property Name="Cod" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="Descrizione" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Procedimento" Relationship="VerificaFirmeModel.FK_Procedimento_Stato" FromRole="Stato" ToRole="Procedimento" />
+        </EntityType>
+        <EntityType Name="Utente">
+          <Key>
+            <PropertyRef Name="Username" />
+          </Key>
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Nome" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Cognome" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="IsAttivo" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="UtenteProfilo" Relationship="VerificaFirmeModel.FK_UtenteProfilo_Utente" FromRole="Utente" ToRole="UtenteProfilo" />
+          <NavigationProperty Name="Procedimento" Relationship="VerificaFirmeModel.UtenteProcedimento" FromRole="Utente" ToRole="Procedimento" />
+        </EntityType>
+        <EntityType Name="UtenteProfilo">
+          <Key>
+            <PropertyRef Name="Username" />
+            <PropertyRef Name="IDProfilo" />
+            <PropertyRef Name="ValidoDal" />
+          </Key>
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="IDProfilo" Type="Int32" Nullable="false" />
+          <Property Name="ValidoDal" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ValidoAl" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Profilo" Relationship="VerificaFirmeModel.FK_UtenteProfilo_Profilo" FromRole="UtenteProfilo" ToRole="Profilo" />
+          <NavigationProperty Name="Utente" Relationship="VerificaFirmeModel.FK_UtenteProfilo_Utente" FromRole="UtenteProfilo" ToRole="Utente" />
+        </EntityType>
+        <EntityType Name="vvComune">
+          <Key>
+            <PropertyRef Name="cod_istat" />
+          </Key>
+          <Property Name="cod_reg" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="cod_istat" Type="String" Nullable="false" MaxLength="6" FixedLength="false" Unicode="false" />
+          <Property Name="sigla_prov" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="des_com" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="DescrizioneCompleta" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="vvProvincia">
+          <Key>
+            <PropertyRef Name="cod_reg" />
+            <PropertyRef Name="cod_prov" />
+            <PropertyRef Name="sigla_prov" />
+            <PropertyRef Name="des_prov" />
+            <PropertyRef Name="des_reg" />
+          </Key>
+          <Property Name="cod_reg" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="cod_prov" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="sigla_prov" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="false" />
+          <Property Name="des_prov" Type="String" Nullable="false" MaxLength="22" FixedLength="false" Unicode="false" />
+          <Property Name="des_reg" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_Modulo_CategorieEsclusione">
+          <End Type="VerificaFirmeModel.CategorieEsclusione" Role="CategorieEsclusione" Multiplicity="0..1" />
+          <End Type="VerificaFirmeModel.Modulo" Role="Modulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieEsclusione">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="Modulo">
+              <PropertyRef Name="CodCategoriaEsclusione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_CategorieEsclusione">
+          <End Type="VerificaFirmeModel.CategorieEsclusione" Role="CategorieEsclusione" Multiplicity="0..1" />
+          <End Type="VerificaFirmeModel.ModuloNominativo" Role="ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieEsclusione">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="CodCategorieEsclusione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_CategorieSanabilita">
+          <End Type="VerificaFirmeModel.CategorieSanabilita" Role="CategorieSanabilita" Multiplicity="0..1" />
+          <End Type="VerificaFirmeModel.ModuloNominativo" Role="ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="CategorieSanabilita">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="CodCategorieSanabilita" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Modulo_ProcedimentoPostazione">
+          <End Type="VerificaFirmeModel.ProcedimentoPostazione" Role="ProcedimentoPostazione" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.Modulo" Role="Modulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProcedimentoPostazione">
+              <PropertyRef Name="IDProcedimento" />
+              <PropertyRef Name="CodicePostazione" />
+            </Principal>
+            <Dependent Role="Modulo">
+              <PropertyRef Name="IDProcedimento" />
+              <PropertyRef Name="CodicePostazione" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativo_Modulo">
+          <End Type="VerificaFirmeModel.Modulo" Role="Modulo" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.ModuloNominativo" Role="ModuloNominativo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulo">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ModuloNominativo">
+              <PropertyRef Name="IDModulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ModuloNominativoLog_ModuloNominativo">
+          <End Type="VerificaFirmeModel.ModuloNominativo" Role="ModuloNominativo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="VerificaFirmeModel.ModuloNominativoLog" Role="ModuloNominativoLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ModuloNominativo">
+              <PropertyRef Name="IDModulo" />
+              <PropertyRef Name="NumeroRiga" />
+            </Principal>
+            <Dependent Role="ModuloNominativoLog">
+              <PropertyRef Name="IDModuloNominativo" />
+              <PropertyRef Name="NumeroRiga" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Procedimento_Stato">
+          <End Type="VerificaFirmeModel.Stato" Role="Stato" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.Procedimento" Role="Procedimento" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stato">
+              <PropertyRef Name="Cod" />
+            </Principal>
+            <Dependent Role="Procedimento">
+              <PropertyRef Name="CodStato" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ProcedimentoPostazione_Procedimento">
+          <End Type="VerificaFirmeModel.Procedimento" Role="Procedimento" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.ProcedimentoPostazione" Role="ProcedimentoPostazione" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Procedimento">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="ProcedimentoPostazione">
+              <PropertyRef Name="IDProcedimento" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProfilo_Profilo">
+          <End Type="VerificaFirmeModel.Profilo" Role="Profilo" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.UtenteProfilo" Role="UtenteProfilo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Profilo">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="UtenteProfilo">
+              <PropertyRef Name="IDProfilo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UtenteProfilo_Utente">
+          <End Type="VerificaFirmeModel.Utente" Role="Utente" Multiplicity="1" />
+          <End Type="VerificaFirmeModel.UtenteProfilo" Role="UtenteProfilo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Utente">
+              <PropertyRef Name="Username" />
+            </Principal>
+            <Dependent Role="UtenteProfilo">
+              <PropertyRef Name="Username" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="UtenteProcedimento">
+          <End Type="VerificaFirmeModel.Procedimento" Role="Procedimento" Multiplicity="*" />
+          <End Type="VerificaFirmeModel.Utente" Role="Utente" Multiplicity="*" />
+        </Association>
+        <ComplexType Name="Report_NominativiDuplicatiPerProcedimento_Result">
+          <Property Type="Int64" Name="Raggruppamento" Nullable="true" />
+          <Property Type="Int32" Name="NumeroRiga" Nullable="false" />
+          <Property Type="Int32" Name="IDModulo" Nullable="false" />
+          <Property Type="String" Name="CodicePostazione" Nullable="false" MaxLength="3" />
+          <Property Type="Int32" Name="Numero" Nullable="false" />
+          <Property Type="String" Name="Cognome" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="Nome" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="CodComuneNascita" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="DescComuneNascita" Nullable="true" MaxLength="45" />
+          <Property Type="String" Name="CodComuneListaElettorale" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="DescComuneListaElettorale" Nullable="true" MaxLength="45" />
+          <Property Type="DateTime" Name="DataNascita" Nullable="true" />
+          <Property Type="String" Name="CodCategorieEsclusione" Nullable="true" MaxLength="3" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="256" />
+        </ComplexType>
+        <ComplexType Name="Report_RiepilogoDataEntry_Result">
+          <Property Type="String" Name="Descrizione" Nullable="false" MaxLength="250" />
+          <Property Type="Int32" Name="QuorumFirme" Nullable="false" />
+          <Property Type="String" Name="CodicePostazione" Nullable="false" MaxLength="3" />
+          <Property Type="String" Name="NumeroModulo" Nullable="true" MaxLength="10" />
+          <Property Type="Int32" Name="IdModulo" Nullable="true" />
+          <Property Type="Int32" Name="RecordValidi" Nullable="true" />
+          <Property Type="Int32" Name="RecordNulli" Nullable="true" />
+          <Property Type="Int32" Name="RecordSanabili" Nullable="true" />
+          <Property Type="Int32" Name="RecordTotali" Nullable="true" />
+          <Property Type="Int32" Name="Firme" Nullable="true" />
+          <Property Type="String" Name="Stato" Nullable="true" MaxLength="100" />
+        </ComplexType>
+        <ComplexType Name="Report_VerificaMinori_Result">
+          <Property Type="Int32" Name="NumeroRiga" Nullable="false" />
+          <Property Type="Int32" Name="IDModulo" Nullable="false" />
+          <Property Type="String" Name="CodicePostazione" Nullable="false" MaxLength="3" />
+          <Property Type="Int32" Name="Numero" Nullable="false" />
+          <Property Type="String" Name="Cognome" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="Nome" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="CodComuneNascita" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="DescComuneNascita" Nullable="true" MaxLength="45" />
+          <Property Type="String" Name="CodComuneListaElettorale" Nullable="true" MaxLength="6" />
+          <Property Type="String" Name="DescComuneListaElettorale" Nullable="true" MaxLength="45" />
+          <Property Type="DateTime" Name="DataNascita" Nullable="true" />
+          <Property Type="String" Name="CodCategorieEsclusione" Nullable="true" MaxLength="3" />
+          <Property Type="String" Name="Note" Nullable="true" MaxLength="256" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="VerificaFirmeModelStoreContainer" CdmEntityContainer="VerificaFirmeEntities">
+          <EntitySetMapping Name="CategorieEsclusione">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.CategorieEsclusione">
+              <MappingFragment StoreEntitySet="CategorieEsclusione">
+                <ScalarProperty Name="DescrizioneBreve" ColumnName="DescrizioneBreve" />
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="Cod" ColumnName="Cod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CategorieSanabilita">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.CategorieSanabilita">
+              <MappingFragment StoreEntitySet="CategorieSanabilita">
+                <ScalarProperty Name="DescrizioneBreve" ColumnName="DescrizioneBreve" />
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="Cod" ColumnName="Cod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comuni">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Comuni">
+              <MappingFragment StoreEntitySet="Comuni">
+                <ScalarProperty Name="des_com" ColumnName="des_com" />
+                <ScalarProperty Name="sigla_prov" ColumnName="sigla_prov" />
+                <ScalarProperty Name="cod_istat" ColumnName="cod_istat" />
+                <ScalarProperty Name="cod_reg" ColumnName="cod_reg" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Modulo">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Modulo">
+              <MappingFragment StoreEntitySet="Modulo">
+                <ScalarProperty Name="DataOraModifica" ColumnName="DataOraModifica" />
+                <ScalarProperty Name="UsernameModifica" ColumnName="UsernameModifica" />
+                <ScalarProperty Name="DataOraCreazione" ColumnName="DataOraCreazione" />
+                <ScalarProperty Name="UsernameCreazione" ColumnName="UsernameCreazione" />
+                <ScalarProperty Name="IsCompleto" ColumnName="IsCompleto" />
+                <ScalarProperty Name="CodCategoriaEsclusione" ColumnName="CodCategoriaEsclusione" />
+                <ScalarProperty Name="CodComuneListaElettorale" ColumnName="CodComuneListaElettorale" />
+                <ScalarProperty Name="NumeroRighe" ColumnName="NumeroRighe" />
+                <ScalarProperty Name="IsNullo" ColumnName="IsNullo" />
+                <ScalarProperty Name="Numero" ColumnName="Numero" />
+                <ScalarProperty Name="CodicePostazione" ColumnName="CodicePostazione" />
+                <ScalarProperty Name="IDProcedimento" ColumnName="IDProcedimento" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ModuloNominativo">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.ModuloNominativo">
+              <MappingFragment StoreEntitySet="ModuloNominativo">
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="CodCategorieSanabilita" ColumnName="CodCategorieSanabilita" />
+                <ScalarProperty Name="CodCategorieEsclusione" ColumnName="CodCategorieEsclusione" />
+                <ScalarProperty Name="NListaElettorale" ColumnName="NListaElettorale" />
+                <ScalarProperty Name="CodComuneListaElettorale" ColumnName="CodComuneListaElettorale" />
+                <ScalarProperty Name="CodComuneNascita" ColumnName="CodComuneNascita" />
+                <ScalarProperty Name="DataNascita" ColumnName="DataNascita" />
+                <ScalarProperty Name="Cognome" ColumnName="Cognome" />
+                <ScalarProperty Name="Nome" ColumnName="Nome" />
+                <ScalarProperty Name="NumeroRiga" ColumnName="NumeroRiga" />
+                <ScalarProperty Name="IDModulo" ColumnName="IDModulo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ModuloNominativoLog">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.ModuloNominativoLog">
+              <MappingFragment StoreEntitySet="ModuloNominativoLog">
+                <ScalarProperty Name="DataOraModifica" ColumnName="DataOraModifica" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="NumeroRiga" ColumnName="NumeroRiga" />
+                <ScalarProperty Name="IDModuloNominativo" ColumnName="IDModuloNominativo" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Parametri">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Parametri">
+              <MappingFragment StoreEntitySet="Parametri">
+                <ScalarProperty Name="Valore" ColumnName="Valore" />
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="Cod" ColumnName="Cod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Procedimento">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Procedimento">
+              <MappingFragment StoreEntitySet="Procedimento">
+                <ScalarProperty Name="DataOraModifica" ColumnName="DataOraModifica" />
+                <ScalarProperty Name="UsernameModifica" ColumnName="UsernameModifica" />
+                <ScalarProperty Name="DataOraCreazione" ColumnName="DataOraCreazione" />
+                <ScalarProperty Name="UsernameCreazione" ColumnName="UsernameCreazione" />
+                <ScalarProperty Name="AnnoFirmatario" ColumnName="AnnoFirmatario" />
+                <ScalarProperty Name="NumeroModuli" ColumnName="NumeroModuli" />
+                <ScalarProperty Name="NumeroPostazioni" ColumnName="NumeroPostazioni" />
+                <ScalarProperty Name="QuorumFirme" ColumnName="QuorumFirme" />
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="CodStato" ColumnName="CodStato" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProcedimentoPostazione">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.ProcedimentoPostazione">
+              <MappingFragment StoreEntitySet="ProcedimentoPostazione">
+                <ScalarProperty Name="ModuloA" ColumnName="ModuloA" />
+                <ScalarProperty Name="ModuloDa" ColumnName="ModuloDa" />
+                <ScalarProperty Name="CodicePostazione" ColumnName="CodicePostazione" />
+                <ScalarProperty Name="IDProcedimento" ColumnName="IDProcedimento" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Profilo">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Profilo">
+              <MappingFragment StoreEntitySet="Profilo">
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Province">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Province">
+              <MappingFragment StoreEntitySet="Province">
+                <ScalarProperty Name="des_reg" ColumnName="des_reg" />
+                <ScalarProperty Name="des_prov" ColumnName="des_prov" />
+                <ScalarProperty Name="sigla_prov" ColumnName="sigla_prov" />
+                <ScalarProperty Name="cod_prov" ColumnName="cod_prov" />
+                <ScalarProperty Name="cod_reg" ColumnName="cod_reg" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Regioni">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Regioni">
+              <MappingFragment StoreEntitySet="Regioni">
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="Cod" ColumnName="Cod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stato">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Stato">
+              <MappingFragment StoreEntitySet="Stato">
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="Cod" ColumnName="Cod" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Utente">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.Utente">
+              <MappingFragment StoreEntitySet="Utente">
+                <ScalarProperty Name="IsAttivo" ColumnName="IsAttivo" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Cognome" ColumnName="Cognome" />
+                <ScalarProperty Name="Nome" ColumnName="Nome" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UtenteProfilo">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.UtenteProfilo">
+              <MappingFragment StoreEntitySet="UtenteProfilo">
+                <ScalarProperty Name="ValidoAl" ColumnName="ValidoAl" />
+                <ScalarProperty Name="ValidoDal" ColumnName="ValidoDal" />
+                <ScalarProperty Name="IDProfilo" ColumnName="IDProfilo" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vvComune">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.vvComune">
+              <MappingFragment StoreEntitySet="vvComune">
+                <ScalarProperty Name="DescrizioneCompleta" ColumnName="DescrizioneCompleta" />
+                <ScalarProperty Name="des_com" ColumnName="des_com" />
+                <ScalarProperty Name="sigla_prov" ColumnName="sigla_prov" />
+                <ScalarProperty Name="cod_istat" ColumnName="cod_istat" />
+                <ScalarProperty Name="cod_reg" ColumnName="cod_reg" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vvProvincia">
+            <EntityTypeMapping TypeName="VerificaFirmeModel.vvProvincia">
+              <MappingFragment StoreEntitySet="vvProvincia">
+                <ScalarProperty Name="des_reg" ColumnName="des_reg" />
+                <ScalarProperty Name="des_prov" ColumnName="des_prov" />
+                <ScalarProperty Name="sigla_prov" ColumnName="sigla_prov" />
+                <ScalarProperty Name="cod_prov" ColumnName="cod_prov" />
+                <ScalarProperty Name="cod_reg" ColumnName="cod_reg" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="UtenteProcedimento" TypeName="VerificaFirmeModel.UtenteProcedimento" StoreEntitySet="UtenteProcedimento">
+            <EndProperty Name="Utente">
+              <ScalarProperty Name="Username" ColumnName="Username" />
+            </EndProperty>
+            <EndProperty Name="Procedimento">
+              <ScalarProperty Name="ID" ColumnName="IDProcedimento" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <FunctionImportMapping FunctionImportName="Procedimento_Elimina" FunctionName="VerificaFirmeModel.Store.Procedimento_Elimina" />
+          <FunctionImportMapping FunctionImportName="Report_NominativiDuplicatiPerProcedimento" FunctionName="VerificaFirmeModel.Store.Report_NominativiDuplicatiPerProcedimento">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VerificaFirmeModel.Report_NominativiDuplicatiPerProcedimento_Result">
+                <ScalarProperty Name="Raggruppamento" ColumnName="Raggruppamento" />
+                <ScalarProperty Name="NumeroRiga" ColumnName="NumeroRiga" />
+                <ScalarProperty Name="IDModulo" ColumnName="IDModulo" />
+                <ScalarProperty Name="CodicePostazione" ColumnName="CodicePostazione" />
+                <ScalarProperty Name="Numero" ColumnName="Numero" />
+                <ScalarProperty Name="Cognome" ColumnName="Cognome" />
+                <ScalarProperty Name="Nome" ColumnName="Nome" />
+                <ScalarProperty Name="CodComuneNascita" ColumnName="CodComuneNascita" />
+                <ScalarProperty Name="DescComuneNascita" ColumnName="DescComuneNascita" />
+                <ScalarProperty Name="CodComuneListaElettorale" ColumnName="CodComuneListaElettorale" />
+                <ScalarProperty Name="DescComuneListaElettorale" ColumnName="DescComuneListaElettorale" />
+                <ScalarProperty Name="DataNascita" ColumnName="DataNascita" />
+                <ScalarProperty Name="CodCategorieEsclusione" ColumnName="CodCategorieEsclusione" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="Report_RiepilogoDataEntry" FunctionName="VerificaFirmeModel.Store.Report_RiepilogoDataEntry">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VerificaFirmeModel.Report_RiepilogoDataEntry_Result">
+                <ScalarProperty Name="Descrizione" ColumnName="Descrizione" />
+                <ScalarProperty Name="QuorumFirme" ColumnName="QuorumFirme" />
+                <ScalarProperty Name="CodicePostazione" ColumnName="CodicePostazione" />
+                <ScalarProperty Name="NumeroModulo" ColumnName="NumeroModulo" />
+                <ScalarProperty Name="IdModulo" ColumnName="IdModulo" />
+                <ScalarProperty Name="RecordValidi" ColumnName="RecordValidi" />
+                <ScalarProperty Name="RecordNulli" ColumnName="RecordNulli" />
+                <ScalarProperty Name="RecordSanabili" ColumnName="RecordSanabili" />
+                <ScalarProperty Name="RecordTotali" ColumnName="RecordTotali" />
+                <ScalarProperty Name="Firme" ColumnName="Firme" />
+                <ScalarProperty Name="Stato" ColumnName="Stato" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="Report_VerificaMinori" FunctionName="VerificaFirmeModel.Store.Report_VerificaMinori">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="VerificaFirmeModel.Report_VerificaMinori_Result">
+                <ScalarProperty Name="NumeroRiga" ColumnName="NumeroRiga" />
+                <ScalarProperty Name="IDModulo" ColumnName="IDModulo" />
+                <ScalarProperty Name="CodicePostazione" ColumnName="CodicePostazione" />
+                <ScalarProperty Name="Numero" ColumnName="Numero" />
+                <ScalarProperty Name="Cognome" ColumnName="Cognome" />
+                <ScalarProperty Name="Nome" ColumnName="Nome" />
+                <ScalarProperty Name="CodComuneNascita" ColumnName="CodComuneNascita" />
+                <ScalarProperty Name="DescComuneNascita" ColumnName="DescComuneNascita" />
+                <ScalarProperty Name="CodComuneListaElettorale" ColumnName="CodComuneListaElettorale" />
+                <ScalarProperty Name="DescComuneListaElettorale" ColumnName="DescComuneListaElettorale" />
+                <ScalarProperty Name="DataNascita" ColumnName="DataNascita" />
+                <ScalarProperty Name="CodCategorieEsclusione" ColumnName="CodCategorieEsclusione" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Nessuno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

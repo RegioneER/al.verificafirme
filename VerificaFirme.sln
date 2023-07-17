@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerificaFirme.Db", "VerificaFirme.Db\VerificaFirme.Db.csproj", "{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerificaFirme.WebUI", "VerificaFirme.WebUI\VerificaFirme.WebUI.csproj", "{C694CF31-AB56-4261-9F61-55764729062A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ScriptSQL", "ScriptSQL", "{844167BB-600F-4325-ADA7-836EAD5CE8FB}"
+	ProjectSection(SolutionItems) = preProject
+		Script_DB_Dati.sql = Script_DB_Dati.sql
+		Script_DB_Schema.sql = Script_DB_Schema.sql
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerificaFirme.AgidTools", "VerificaFirme.AgidTools\VerificaFirme.AgidTools.csproj", "{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugLocal|Any CPU = DebugLocal|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D039DE34-5DE1-480A-BB9C-9EFF73F9201F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C694CF31-AB56-4261-9F61-55764729062A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9182FEF-5176-4DDD-A5CF-ED0DC414977D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {596974C5-36B7-4F5D-A3CA-57A243C7D768}
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN2019 - Subversion Support for Visual Studio
+	EndGlobalSection
+EndGlobal

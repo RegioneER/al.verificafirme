@@ -1,0 +1,56 @@
+﻿@model bool?
+@{
+    if (ViewData.ModelMetadata.IsNullableValueType)
+    {
+        Dictionary<string, object> yesAttrs = new Dictionary<string, object>();
+        Dictionary<string, object> noAttrs = new Dictionary<string, object>();
+        Dictionary<string, object> nullAttrs = new Dictionary<string, object>();
+
+        yesAttrs.Add("id", ViewData.TemplateInfo.GetFullHtmlFieldId("") + "Yes");
+        noAttrs.Add("id", ViewData.TemplateInfo.GetFullHtmlFieldId("") + "No");
+        nullAttrs.Add("id", ViewData.TemplateInfo.GetFullHtmlFieldId("") + "NA");
+
+
+        if (Model.HasValue && Model.Value)
+        {
+            yesAttrs.Add("checked", "checked");
+        }
+        else if (Model.HasValue && !Model.Value)
+        {
+            noAttrs.Add("checked", "checked");
+        }
+        else
+        {
+            nullAttrs.Add("checked", "checked");
+        }
+
+        <br>
+        <div class="row">
+            <div class="form-check form-check-inline">
+                @Html.RadioButtonFor(x => x, "", nullAttrs)
+                <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))NA" class="nostrong" title="Non definito">N.D.</label>
+            </div>
+            <div class="form-check form-check-inline">
+                @Html.RadioButtonFor(x => x, "true", yesAttrs)
+                <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))Yes">Si</label>
+            </div>
+            <div class="form-check form-check-inline">
+                @Html.RadioButtonFor(x => x, "false", noAttrs)
+                <label for="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))No">No</label>
+            </div>
+        </div>
+
+
+    }
+    else
+    {
+        if (Model.HasValue && Model.Value)
+        {
+            <input id="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))" name="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))" type="checkbox" checked="checked" data-val="true" value="true">
+        }
+        else
+        {
+            <input id="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))" name="@(ViewData.TemplateInfo.GetFullHtmlFieldId(""))" type="checkbox" data-val="true" value="true">
+        }
+    }
+}

@@ -1,0 +1,105 @@
+﻿@using RER.Tools.MVC.Agid
+@model VerificaFirme.WebUI.Models.CercaProcedimentoViewModel
+@{
+    ViewBag.Title = "Controllo amministrativo";
+}
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2 class="card-title">Cerca il procedimento su cui effettuare il controllo amministrativo</h2>
+            <br />
+            @using (Html.BeginForm("Index", "ControlloAmministrativo", FormMethod.Get))
+            {
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        @Html.AgidDropDownListFor(model => model.IdProcedimento, Model.ElencoProcedimenti, optionLabel: "Seleziona un procedimento", useBootstrapSelect: false)
+                    </div>
+                    <div class="col-xs-12 col-sm-3">
+                        @Html.AgidDropDownListFor(model => model.CodStato, Model.ElencoStati, optionLabel: "Seleziona lo stato", useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary" title="Cerca tra i procedimenti"><i class='fas fa-search' aria-hidden="true"></i> Cerca</button>
+                        <a href="@Url.Action("")" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    </div>
+                </div>
+            }
+            <hr />
+            @if (Model != null && Model.RisultatiRicerca.Any())
+            {
+                <div>
+                    @{
+                        string testoTrovati = "";
+                        if (Model.RisultatiRicerca.Count == 0)
+                        {
+                            testoTrovati = "Non sono stati trovati procedimenti";
+                        }
+                        else if (Model.RisultatiRicerca.Count == 1)
+                        {
+                            testoTrovati = "È stato trovato 1 solo procedimenti";
+                        }
+                        else
+                        {
+                            testoTrovati = $"Sono stati trovati {Model.RisultatiRicerca.Count} procedimenti";
+                        }
+                    }
+                    <p><span aria-live="polite" tabindex=0 id="spnTrovati">@testoTrovati</span></p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Procedimento</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Firme/Quorum</th>
+                                <th scope="col">Operazioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RisultatiRicerca)
+                            {
+                                var ariaC = $"Controllo amministrativo procedimento {item.Descrizione}";
+                                var ariaP = $"Prospetto riepilogo procedimento {item.Descrizione}";
+                                var ariaV = $"Verifiche procedimento {item.Descrizione}";
+                                <tr>
+                                    <td>@item.Descrizione</td>
+                                    <td>@item.Stato.Descrizione</td>
+                                    <td>@item.NrFirme.ToString("N0")/@item.QuorumFirme.ToString("N0")</td>
+                                    <td>
+                                        <a class="btn btn-link" href="@Url.Action("ProspettoRiepilogo", "Procedimento", new { @IdProcedimento = item.ID })" title="Vai al prospetto del procedimento" aria-label="@ariaP"><i class="fas fa-chart-bar"></i> Prospetto riepilogo</a><br />
+                                        @if (item.IsVisualizzabile(VerificaFirme.Db.RERIAMPrincipal.Corrente))
+                                        {
+                                            <a class="btn btn-link" href="@Url.Action("Dettaglio", "ControlloAmministrativo", new { @IdProcedimento = item.ID })" title="Vai al controllo amministrativo del procedimento" aria-label="@ariaC"><i class="fas fa-tasks"></i> Controllo amministrativo</a><br />
+                                        }
+                                        <a class="btn btn-link" href="@Url.Action("Index", "Report", new { @IdProcedimento = item.ID })" title="Vai alle verifiche del procedimento"><i class="far fa-newspaper" aria-label="@ariaV"></i> Verifiche</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>Nessun procedimento trovato</p>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#spnTrovati").focus();
+</script>

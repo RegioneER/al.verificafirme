@@ -1,0 +1,5 @@
+﻿@model bool?
+
+<span>
+    @(!Model.HasValue ? "No" : (Model.Value ? "Si" : "No" ))
+</span>

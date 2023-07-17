@@ -1,0 +1,118 @@
+﻿@model VerificaFirme.WebUI.Models.CercaProcedimentoViewModel
+@using RER.Tools.MVC.Agid
+@{
+    ViewBag.Title = "Configurazione procedimenti";
+}
+
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2>Ricerca procedimenti</h2>
+            <br />
+            @using (Html.BeginForm("Cerca", "Procedimento", FormMethod.Get))
+            {
+                @*<input type="hidden" name="sessionIDBC" id="sessionIDBC_1" value="@ViewBag.sessionIDBC" />*@
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownListFor(model => model.IdProcedimento, Model.ElencoProcedimenti, optionLabel: "Seleziona un procedimento", useBootstrapSelect: false)
+                    </div>
+                    <div class="col-xs-12 col-md-2">
+                        @Html.AgidDropDownListFor(model => model.CodStato, Model.ElencoStati, optionLabel: "Seleziona lo stato", useBootstrapSelect: false)
+                    </div>
+
+                </div>
+                <div class="col-xs-12">
+                    <button type="submit" class="btn btn-primary" title="Cerca tra i procedimenti"><i class='fas fa-search' aria-hidden="true"></i> Cerca</button>
+                    <a href="@Url.Action("Cerca")" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    <a class="btn" href="@Url.Action("Crea", "Procedimento")" title="Crea un nuovo procedimento"><i class='fas fa-plus' aria-hidden="true"></i> Crea un procedimento</a>
+                </div>
+            }
+            <hr />
+            @using (Html.BeginForm("Cerca", "Procedimento", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @*<input type="hidden" name="sessionIDBC" id="sessionIDBC_2" value="@ViewBag.sessionIDBC" />*@
+                <input type="hidden" name="IDProcedimentoCorrente" id="IDProcedimentoCorrente" value="" />
+                <input type="hidden" name="IDProcedimentoRicerca" id="IDProcedimentoRicerca" value="@Model.IdProcedimento" />
+                <input type="hidden" name="CodStatoRicerca" id="CodStatoRicerca" value="@Model.CodStato" />
+                <div>
+                    @{
+                        string testoTrovati = "";
+                        if (Model.RisultatiRicerca.Count == 0)
+                        {
+                            testoTrovati = "Non sono stati trovati procedimenti";
+                        }
+                        else if (Model.RisultatiRicerca.Count == 1)
+                        {
+                            testoTrovati = "È stato trovato 1 solo procedimento";
+                        }
+                        else
+                        {
+                            testoTrovati = $"Sono stati trovati {Model.RisultatiRicerca.Count} procedimenti";
+                        }
+                    }
+                    <p><span aria-live="polite" tabindex=0 id="spnTrovati">@testoTrovati</span></p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Procedimento</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Firme/Quorum</th>
+                                <th scope="col">Ultime modifiche</th>
+                                <th scope="col">Operazioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.RisultatiRicerca)
+                            {
+                                <tr>
+                                    <td>@item.Descrizione</td>
+                                    <td>@item.Stato.Descrizione</td>
+                                    <td>@item.NrFirme.ToString("N0")/@item.QuorumFirme.ToString("N0")</td>
+                                    <td>@item.UtenteModifica()</td>
+                                    <td>
+                                        @{
+                                            var classe = item.IsConcluso ? "fas fa-eye" : "far fa-edit";
+                                            var testo = item.IsConcluso ? "Visualizza" : "Configurazione";
+                                            var ariaG = $"{testo} procedimento {item.Descrizione}";
+                                            var ariaC = $"Concludi procedimento {item.Descrizione}";
+                                            var ariaR = $"Riattiva procedimento {item.Descrizione}";
+                                        }
+                                        <a class="btn btn-link" href="@Url.Action("Modifica", "Procedimento", new { @ID = item.ID })" aria-label="@ariaG"><i class="@classe"></i> @testo</a>
+                                        @if (item.CodStato == "ATT")
+                                        {
+                                            <button onclick="return impostaID('@item.ID', 'C')" type="submit" class="btn btn-link nospinner" formmethod="post" formaction="Concludi" aria-label="@ariaC"><i class="fas fa-lock"></i> Concludi</button>
+                                        }
+                                        else if (item.CodStato == "CON")
+                                        {
+                                            <button onclick="return impostaID('@item.ID', 'R')" type="submit" class="btn btn-link nospinner" formmethod="post" formaction="Riattiva" aria-label="@ariaR"><i class="fas fa-lock-open"></i> Riattiva</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function impostaID(idPRocedimentoDaImpostare, operazione) {
+        $("#IDProcedimentoCorrente").val(idPRocedimentoDaImpostare);
+        return confirm(operazione === 'C' ? "Si vuole procedere con la conclusione del procedimento?" : "Si vuole procedere con la riattivazione del procedimento?");
+    }
+    $("#spnTrovati").focus();
+</script>

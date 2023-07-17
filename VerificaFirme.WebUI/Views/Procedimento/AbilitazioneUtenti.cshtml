@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "AbilitazioneUtenti";
+}
+
+@model VerificaFirme.WebUI.Models.AbilitazioneUtentiProcedimentoViewModel
+@using RER.Tools.MVC.Agid
+@{
+    ViewBag.Title = "Abilitazione utenti";
+}
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2 class="card-title">Cerca il procedimento su cui abilitare gli utenti</h2>
+            <br />
+            @using (Html.BeginForm("AbilitazioneUtenti", "Procedimento", FormMethod.Get))
+            {
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownListFor(model => model.IdProcedimento, Model.ElencoProcedimenti, optionLabel: "Selezionare un procedimento", required: true, useBootstrapSelect: false)
+                    </div>
+                    <div class="col-xs-12 col-md-3">
+                        @Html.AgidDropDownListFor(model => model.IdProfilo, Model.ElencoProfili, optionLabel: "Tutti", useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary" title="Cerca tra gli utenti"><i class='fas fa-search' aria-hidden="true"></i> Cerca</button>
+                        <a href="@Url.Action("AbilitazioneUtenti")" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    </div>
+                </div>
+            }
+            @if (Model.ElencoAbilitazioni != null && Model.ElencoAbilitazioni.Any())
+            {
+                using (Html.BeginForm("SalvaAbilitazioneUtenti", "Procedimento"))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="IdProcedimento" id="Ab_IdProcediento" value="@Model.IdProcedimento" />
+                    <input type="hidden" name="IdProfilo" id="Ab_IdProfilo" value="@Model.IdProfilo" />
+                    <br />
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h3>@Model.ElencoAbilitazioni.FirstOrDefault().DescrizioneProcedimento</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            @{
+                                string testoTrovati = "";
+                                if (Model.ElencoAbilitazioni.Count == 0)
+                                {
+                                    testoTrovati = "Non sono stati trovati utenti";
+                                }
+                                else if (Model.ElencoAbilitazioni.Count == 1)
+                                {
+                                    testoTrovati = "È stato trovato 1 solo utente";
+                                }
+                                else
+                                {
+                                    testoTrovati = $"Sono stati trovati {Model.ElencoAbilitazioni.Count} utenti";
+                                }
+                            }
+                            <p><span aria-live="polite" tabindex=0 id="spnTrovati">@testoTrovati</span></p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 50px" class="align-top">
+                                            <div class="form-check topAlign">
+                                                <div class="toggles">
+                                                    <label for="SelezionaTutti">
+                                                        <span style="width: 50px;">Abilita/Disabilita</span>
+                                                        <input type="checkbox" id="SelezionaTutti" name="SelezionaTutti">
+                                                        <span class="lever"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </th>
+                                        <th scope="col" class="align-top">Nominativo</th>
+                                        <th scope="col" class="align-top">Profilo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{int i = 0; }
+                                    @foreach (var item in Model.ElencoAbilitazioni)
+                                    {
+                                        <tr>
+                                            <td style="width: 50px">
+                                                <input type="hidden" name="ElencoAbilitazioni[@i].IdProcediento" id="ElencoAbilitazioni_@(i)_IdProcediento" value="@item.IdProcediento" />
+                                                <input type="hidden" name="ElencoAbilitazioni[@i].IdProfilo" id="ElencoAbilitazioni_@(i)_IdProfilo" value="@item.IdProfilo" />
+                                                <input type="hidden" name="ElencoAbilitazioni[@i].Username" id="ElencoAbilitazioni_@(i)_Username" value="@item.Username" />
+                                                <div class="form-check">
+                                                    <div class="toggles">
+                                                        <label for="ElencoAbilitazioni_@(i)_Abilitato">
+                                                            <input name="ElencoAbilitazioni[@i].Abilitato" id="ElencoAbilitazioni_@(i)_Abilitato" type="checkbox" value="true" @((item.Abilitato ?? false) ? "checked" : "")>
+                                                            <span class="lever"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><label for="ElencoAbilitazioni_@(i)_Abilitato">@item.Nominativo  </label></td>
+                                            <td>@item.DescrizioneProfilo</td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-right">
+                            <button type="submit" class="btn btn-primary nospinner" title="Salva le associazioni"><i class="far fa-save"></i> Salva</button>
+                            <a href="@Url.Action("AbilitazioneUtenti", new { IdProcedimento = Model.IdProcedimento, IdProfilo = Model.IdProfilo })" class="btn btn-secondary" title="Annulla tutte le modifiche"><i class="fas fa-undo"></i> Annulla</a>
+                        </div>
+                    </div>
+                }
+            }
+            else if (Model.ElencoAbilitazioni != null && !Model.ElencoAbilitazioni.Any())
+            {
+                <br />
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>Nessun elemento trovato.</p>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+<script>
+    $("#SelezionaTutti").change(function () {
+        var testo = '';
+        if ($("#SelezionaTutti").is(':checked')) {
+            testo = 'Sei sicuro di voler abilitare tutti gli utenti?'
+        }
+        else {
+            testo = 'Sei sicuro di voler disabilitare tutti gli utenti?'
+        }
+        if (confirm(testo)) {
+            SelezionaTutti();
+        }
+        else {
+            if ($("#SelezionaTutti").is(':checked')) {
+                $("#SelezionaTutti").prop("checked", false);
+            }
+            else {
+                $("#SelezionaTutti").prop("checked", true);
+            }
+        }
+    });
+
+    function SelezionaTutti() {
+        if ($("#SelezionaTutti").is(':checked')) {
+            $("input[type='checkbox']").prop("checked", true);
+        }
+        else {
+            $("input[type='checkbox']").prop("checked", false);
+        };
+    }
+
+    $("#spnTrovati").focus();
+</script>
+

@@ -1,0 +1,123 @@
+﻿@using RER.Tools.MVC.Agid
+@model VerificaFirme.WebUI.Models.ModuloViewModel
+@{
+    ViewBag.Title = "Dettaglio procedimento";
+}
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+<h2>@Model.Procedimento.Descrizione</h2>
+
+@Html.Partial("_partialDatiGeneraliProcedura", Model)
+
+@if (!Model.Procedimento.IsConcluso)
+{
+    using (Html.BeginForm("CreaModulo", "Modulo", FormMethod.Post, new { @id = "formNuovoModulo" }))
+    {
+        @Html.AntiForgeryToken();
+
+        @Html.Partial("_partialCreaNuovoModulo", Model)
+    }
+}
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h3 class="card-title">I miei moduli in lavorazione</h3>
+            @if (Model.MieiModuliInLavorazione == null || Model.MieiModuliInLavorazione.Count == 0)
+            {
+                <p>Non sono presenti dei moduli</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Postazione.Modulo</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Ultima modifica</th>
+                                <th scope="col">Operazioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.MieiModuliInLavorazione)
+                            {
+                                <tr>
+                                    @{
+                                        string codice = $"{item.CodicePostazione}.{item.Numero}";
+                                    }
+                                    <td>@codice</td>
+                                    <td>@item.Stato</td>
+                                    <td>@item.UtenteModifica(false)</td>
+                                    <td>
+                                        @{
+                                            var classe = Model.Procedimento.IsConcluso || item.IsCompleto ? "fas fa-eye" : "fas fa-pen";
+                                            var testo = Model.Procedimento.IsConcluso || item.IsCompleto ? "Visualizza" : "Gestione";
+                                            var aria = $"{testo} modulo {codice}";
+                                        }
+                                        <a href='@Url.Action("Compila", "Modulo", new { IdModulo = item.ID })' title="@testo" class="btn btn-link" aria-label="@aria"><i class="@classe" aria-hidden="true"></i> @testo</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h3 class="card-title">Moduli in lavorazione di altri utenti</h3>
+            @if (Model.ModuliInLavorazioneAltriUtenti == null || Model.ModuliInLavorazioneAltriUtenti.Count == 0)
+            {
+                <p>Non sono presenti dei moduli</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">Postazione.Modulo</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Ultima modifica</th>
+                                <th scope="col">Operazioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ModuliInLavorazioneAltriUtenti)
+                            {
+                                <tr>
+                                    @{
+                                        string codice = $"{item.CodicePostazione}.{item.Numero}";
+                                    }
+                                    <td>@codice</td>
+                                    <td>@item.Stato</td>
+                                    <td>@item.UtenteModifica(false)</td>
+                                    <td>
+                                        @{
+                                            var classe = Model.Procedimento.IsConcluso || item.IsCompleto ? "fas fa-eye" : "fas fa-pen";
+                                            var testo = Model.Procedimento.IsConcluso || item.IsCompleto ? "Visualizza" : "Modifica";
+                                            var aria = $"{testo} modulo {codice}";
+                                            string conferma = Model.Procedimento.IsConcluso || item.IsCompleto ? "return true" : string.Format("return confirm('Il modulo è stato modificato per ultimo da {0}, intendi proseguire?')", item.UtenteModifica(true));
+                                        }
+                                        <a class="btn btn-link" href='@Url.Action("Compila", "Modulo", new { IdModulo = item.ID })' title="@testo" onclick="@conferma" aria-label="@aria"><i class="@classe" aria-hidden="true"></i> @testo</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+

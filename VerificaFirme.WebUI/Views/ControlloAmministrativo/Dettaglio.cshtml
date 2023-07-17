@@ -1,0 +1,79 @@
+﻿@using RER.Tools.MVC.Agid
+@model VerificaFirme.WebUI.Models.ModuloViewModel
+@{
+    ViewBag.Title = "Controllo amministrativo";
+}
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+<h2>@Model.Procedimento.Descrizione</h2>
+@Html.Partial("_partialDatiGeneraliProcedura", Model)
+
+@if (!Model.Procedimento.IsConcluso)
+{
+
+    using (Html.BeginForm("CreaModulo", "ControlloAmministrativo", FormMethod.Post, new { @id = "formNuovoModulo" }))
+    {
+        @Html.AntiForgeryToken();
+
+        @Html.Partial("_partialCreaNuovoModulo", Model)
+    }
+}
+@using (Html.BeginForm("Dettaglio", "ControlloAmministrativo", FormMethod.Get, new { @id = "formCercaModuloCA" }))
+{
+    <input type="hidden" id="IdProcedimentoDettaglio" name="IdProcedimento" value="@Model.Procedimento.ID" />
+    <div class="card-wrapper card-space">
+        <div class="card card-bg">
+            <div class="card-body">
+                <h3 class="card-title">Elenco moduli</h3><br />
+                <div class="row">
+                    <div class="col-2 col-xs-12">
+                        @Html.AgidDropDownList("CodPostazioneFiltro", "Seleziona postazione", Model.ElencoPostazioni, null, optionLabel: "Tutti", required: false, externalDivAdditionalClasses: "myPostazioni", useBootstrapSelect: false, value: Model.PostazioneFiltro)
+                    </div>
+                    <div class="col-2 col-xs-12">
+                        @Html.AgidTextBox("NrModuloFiltro", "Modulo", ExtensionMethods.TextBoxType.Number, !Model.ModuloFiltro.HasValue ? "" : Model.ModuloFiltro.ToString())
+                    </div>
+                    <div class="col-xs-12">
+                        <button class="btn btn-primary" type="submit" title="Filtra le postazioni/moduli"><i class="fas fa-filter"></i> Filtra</button>
+                        <a href="@Url.Action("Dettaglio", new { @IdProcedimento = Model.Procedimento.ID})" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover table-sm" id="tabpagerCADettaglio">
+                        <thead>
+                            <tr>
+                                <th scope="col">Postazione.Modulo</th>
+                                <th scope="col">Stato</th>
+                                <th scope="col">Ultima modifica</th>
+                                <th scope="col">Operazioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.TuttiModuliInLavorazione)
+                            {
+                                <tr>
+                                    @{
+                                        string codice = $"{item.CodicePostazione}.{item.Numero}";
+                                    }
+                                    <td>@codice</td>
+                                    <td>@item.Stato</td>
+                                    <td>@item.UtenteModifica(false)</td>
+                                    <td>
+                                        @{
+                                            var classe = Model.Procedimento.IsConcluso ? "fas fa-eye" : "fas fa-pen";
+                                            var testo = Model.Procedimento.IsConcluso ? "Visualizza" : "Gestione";
+                                            var ariaC = $"{testo} modulo {codice}";
+                                        }
+                                        <a href='@Url.Action("Compila", "ControlloAmministrativo", new { IdModulo = item.ID })' title="Avvia controllo amministrativo" class="btn btn-link" aria-label="@ariaC"><i class="@classe" aria-hidden="true"></i> @testo</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}

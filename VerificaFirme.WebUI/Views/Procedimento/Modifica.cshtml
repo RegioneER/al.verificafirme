@@ -1,0 +1,269 @@
+﻿@model VerificaFirme.Db.Procedimento
+@using RER.Tools.MVC.Agid
+@{
+    bool nuovoInserimento = Model == null || Model.ID <= 0;
+    if (nuovoInserimento)
+    {
+        ViewBag.Title = "Crea nuovo procedimento";
+    }
+    else if (Model.IsConcluso)
+    {
+        ViewBag.Title = "Configura procedimento";
+    }
+    else
+    {
+        ViewBag.Title = "Configura procedimento";
+    }
+
+
+
+    bool readOnly = !(Model?.IsModificabile ?? true);
+    bool isConcluso = Model.IsConcluso;
+    string classInserimento = nuovoInserimento ? "col-12 col-xs-12 col-sm-12 col-md-12" : "col-12 col-sm-12 col-xs-12 col-md-12 col-lg-6";
+}
+
+@if (Model != null)
+{
+    @Html.Partial("_partialViewAlert", Model.Alerts)
+}
+
+
+@using (Html.BeginForm("Modifica", "Procedimento", FormMethod.Post, new { @id = "formCompilazioneProcedimento" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ID)
+    @Html.HiddenFor(model => model.NumeroModuliOriginale)
+    @Html.HiddenFor(model => model.NumeroPostazioniOriginale)
+    <div class="row">
+        <div class="@classInserimento">
+            <div class="card-wrapper card-space">
+                <div class="card card-bg">
+                    <div class="card-body">
+                        @if (Model != null && Model.Stato != null && Model.Stato.Cod == "CON")
+                        {
+                            <div class="alert alert-info" role="alert">
+                                Il procedimento è concluso, pertanto non è più possibile modificare i dati.
+                            </div>
+                        }
+
+                        @if (!nuovoInserimento)
+                        {
+                            <div class="row">
+                                <div class="col-12 col-lg-12">
+                                    Stato: @Model.Stato.Descrizione
+                                </div>
+                            </div>
+                            <br />
+                        }
+                        <div class="row">
+                            <div class="col-12 col-lg-12">
+                                @Html.AgidTextAreaFor(model => model.Descrizione, "Descrizione", required: true, isReadOnly: isConcluso)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-md-3">
+                                @{
+                                    int maxQuorum = (int)ViewBag.MaxQuorum;
+                                }
+                                @Html.AgidTextBoxFor(model => model.QuorumFirme, ExtensionMethods.TextBoxType.Number, "Quorum", required: true, isReadonly: isConcluso, min: 1, max: @maxQuorum, step: 1)
+                            </div>
+                            <div class="col-xs-12 col-md-3">
+                                @{
+                                    int maxPostazioni = (int)ViewBag.MaxPostazioniProcedimento;
+                                }
+                                @Html.AgidTextBoxFor(model => model.NumeroPostazioni, ExtensionMethods.TextBoxType.Number, "Numero postazioni", required: true, isReadonly: readOnly, min: 1, max: @maxPostazioni, step: 1)
+                            </div>
+                            <div class="col-xs-12 col-md-3">
+                                @{
+                                    int maxModuliProcedimento = (int)ViewBag.MaxModuliProcedimento;
+                                    int minModuliProcedimento = readOnly && !isConcluso ? Model.NumeroModuli : 1;
+                                }
+                                @Html.AgidTextBoxFor(model => model.NumeroModuli, ExtensionMethods.TextBoxType.Number, "Numero moduli", required: true, testoInformativo: readOnly && !isConcluso ? "È possibile solo aumentare il numero dei moduli." : "", isReadonly: isConcluso, step: 1, min: @minModuliProcedimento, max: @maxModuliProcedimento)
+                            </div>
+                            <div class="col-xs-12 col-md-3">
+                                @{
+                                    int minAnnoFirmatario = (int)ViewBag.MinAnnoFirmatario;
+                                    int maxAnnoFirmatario = DateTime.Now.Year;
+                                }
+                                @Html.AgidTextBoxFor(model => model.AnnoFirmatario, ExtensionMethods.TextBoxType.Number, "Anno di validità dei firmatari", required: true, isReadonly: isConcluso || readOnly, step: 1, max: @maxAnnoFirmatario, min: @minAnnoFirmatario)
+                            </div>
+                        </div>
+                        @if (!nuovoInserimento)
+                        {
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-wrapper card-space">
+                                        <div class="card card-bg">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <h2 class="card-title">Elenco utenti abilitati</h2>
+                                                        @if (Model.Utente == null || Model.Utente.Count == 0)
+                                                        {
+                                                            <p>Non sono presenti utenti</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            List<VerificaFirme.Db.Utente> utenti = Model.Utente.ToList();
+
+                                                            foreach (VerificaFirme.Db.Utente utente in utenti.Where(x => x.UtenteProfilo.Any(z => z.ValidoDal <= DateTime.Now && (!z.ValidoAl.HasValue || z.ValidoAl.Value >= DateTime.Now) && z.IDProfilo == (int)VerificaFirme.Db.RuoloUtente.Supervisore)).OrderBy(x => x.Cognome))
+                                                            {
+                                                                <p>@utente.Cognome @utente.Nome (@utente.UtenteProfilo.FirstOrDefault(x => x.ValidoDal <= DateTime.Now && (!x.ValidoAl.HasValue || x.ValidoAl.Value >= DateTime.Now)).Profilo.Descrizione)</p>
+                                                            }
+                                                            <hr />
+                                                            foreach (VerificaFirme.Db.Utente utente in utenti.Where(x => x.UtenteProfilo.Any(z => z.ValidoDal <= DateTime.Now && (!z.ValidoAl.HasValue || z.ValidoAl.Value >= DateTime.Now) && z.IDProfilo == (int)VerificaFirme.Db.RuoloUtente.Dataentry)).OrderBy(x => x.Cognome))
+                                                            {
+                                                                <p>@utente.Cognome @utente.Nome (@utente.UtenteProfilo.FirstOrDefault(x => x.ValidoDal <= DateTime.Now && (!x.ValidoAl.HasValue || x.ValidoAl.Value >= DateTime.Now)).Profilo.Descrizione)</p>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (!nuovoInserimento)
+        {
+            <div class="col-12 col-sm-12 col-xs-12 col-md-12 col-lg-6">
+                <div class="card-wrapper card-space">
+                    <div class="card card-bg">
+                        <div class="card-body">
+                            <table class="table table-condensed table-striped">
+                                <thead>
+                                    <tr>
+                                        <th id="thPostazione">Postazione</th>
+                                        <th id="thModuloDa">Modulo da</th>
+                                        <th id="thModuloA">Modulo a</th>
+                                        <th id="thtotale">Nr. Moduli</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.ProcedimentoPostazione != null)
+                                    {
+                                        int index = 0;
+                                        foreach (var item in Model.ProcedimentoPostazione)
+                                        {
+                                            <tr>
+                                                <td>@item.CodicePostazione <input type="hidden" name="ProcedimentoPostazione[@index].CodicePostazione" id="ProcedimentoPostazione_@(index)_CodicePostazione" value="@item.CodicePostazione" /></td>
+                                                <td>
+                                                    @Html.AgidTextBoxNoLabel($"ProcedimentoPostazione[{index}].ModuloDa", "thModuloDa", "Modulo da", ExtensionMethods.TextBoxType.Number, item.ModuloDa.ToString(), isRequired: true, isReadonly: readOnly, step: 1, min: 1, max: @maxModuliProcedimento)
+                                                </td>
+                                                <td>
+                                                    @Html.AgidTextBoxNoLabel($"ProcedimentoPostazione[{index}].ModuloA", "thModuloA", "Modulo a", ExtensionMethods.TextBoxType.Number, item.ModuloA.ToString(), isRequired: true, isReadonly: readOnly, step: 1, min: 1, max: @maxModuliProcedimento)
+                                                </td>
+                                                <td>
+                                                    @(item.ModuloA - item.ModuloDa + 1)
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-12 text-right">
+            <br />
+            @if (nuovoInserimento || Model.CodStato != "CON")
+            {
+                <button type="submit" id="btnSalva" class="btn btn-primary nospinner" formaction="@Url.Action("Modifica")" title="Salva il procedimento" onclick="return confermaRidistribuzione();"><i class="far fa-save"></i> Salva</button>
+                if (Model != null && Model.ID > 0)
+                {
+                    <a href="@Url.Action("Modifica", new { id = Model.ID })" class="btn btn-secondary" title="Annulla tutte le modifiche"><i class="fas fa-undo"></i> Annulla</a>
+                    if (!readOnly)
+                    {
+                        <button type="submit" id="btnElimina" class="btn btn-secondary nospinner" formaction="@Url.Action("Elimina")" title="Elimina il procedimento" onclick="return confirm('Se si continua, il procedimento verrà eliminato. Si desidera continuare?');"><i class="fas fa-trash-alt"></i> Elimina</button>
+                    }
+                }
+                else
+                {
+                    <a href="@Url.Action("Crea")" class="btn btn-secondary" title="Annulla tutte le modifiche"><i class="fas fa-undo"></i> Annulla</a>
+                }
+            }
+            @{
+                List<BreadCrumbItem> briciole = (List<BreadCrumbItem>)HttpContext.Current.Session["briciole"];
+                if (briciole != null)
+                {
+                    BreadCrumbItem briciola = briciole.FirstOrDefault(x => x.ControllerName.Equals("Procedimento", StringComparison.InvariantCultureIgnoreCase) && x.ActionName.Equals("Cerca", StringComparison.InvariantCultureIgnoreCase));
+                    if (briciola != null)
+                    {
+                        string url = "";
+                        if (!string.IsNullOrEmpty(briciola.ActionLink))
+                        {
+                            url = briciola.ActionLink;
+                        }
+                        else
+                        {
+                            url = Url.Action("Cerca");
+                        }
+
+                        <a href="@url" class="btn btn-secondary" title="Torna alla ricerca"><i class="fas fa-undo"></i> Torna alla ricerca</a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Cerca")" class="btn btn-secondary" title="Torna alla ricerca"><i class="fas fa-undo"></i> Torna alla ricerca</a>
+                    }
+                }
+                else
+                {
+                    <a href="@Url.Action("Cerca")" class="btn btn-secondary" title="Torna alla ricerca"><i class="fas fa-undo"></i> Torna alla ricerca</a>
+                }
+
+            }
+
+        </div>
+    </div>
+}
+
+@if (Model?.IsModificabile ?? true)
+{
+    <script>
+        function confermaRidistribuzione() {
+
+            var nrPos = $("#Procedimento_NumeroPostazioni").val();
+            var nrPosOr = @(Model?.NumeroPostazioni ?? 0);
+
+            var nrMod = $("#Procedimento_NumeroModuli").val();
+            var nrModOr = @(Model?.NumeroModuli ?? 0);
+
+            var idProc = $("#ID").val();
+
+
+            if (idProc > 0 &&  (nrPos != nrPosOr || nrMod != nrModOr)) {
+                if (confirm('Se si continua, la distribuzione dei moduli verrà ricalcolata e i dati verranno sovrascritti. Si desidera continuare?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+}
+else
+{
+    <script>
+        function confermaRidistribuzione() {
+            var nrMod = $("#Procedimento_NumeroModuli").val();
+            var nrModOr = @(Model?.NumeroModuli ?? 0);
+
+            if (nrMod > nrModOr) {
+                return confirm("Se si continua, i moduli aggiunti verranno aggiunti all'ultima postazione. Si desidera continuare?");
+            }
+        }
+    </script>
+}

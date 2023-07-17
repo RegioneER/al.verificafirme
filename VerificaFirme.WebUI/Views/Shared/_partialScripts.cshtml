@@ -1,0 +1,32 @@
+﻿@using RER.Tools.MVC.Agid
+@{
+    var baseUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority.Replace(":" + Request.Url.Port, ""), Url.Content("~"));
+}
+
+<script>
+
+    function NascondiMainAlertTab() {
+
+        var mainAlertDivTab = $("#mainAlertDivTab");
+        if (mainAlertDivTab.length) {
+            mainAlertDivTab.hide();
+        }
+
+    }
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    $(document).ready(function () {
+        // inizializzazione del datetime picket
+        $('.it-date-datepicker').datepicker({
+            inputFormat: ["dd/MM/yyyy"],
+            outputFormat: 'dd/MM/yyyy',
+        });
+        // Serve per sistemare il bug della lunghezza delle label
+        $("label[style]").width("auto");
+    });
+
+</script>
+

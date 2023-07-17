@@ -1,0 +1,32 @@
+﻿@model VerificaFirme.WebUI.Models.ReportViewModel
+@using RER.Tools.MVC.Agid
+@{
+    ViewBag.Title = "Verifiche";
+}
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            @using (Html.BeginForm("MostraReport", "Report", FormMethod.Post, new { @id = "formRicercaDuplicati" }))
+            {
+                @Html.AntiForgeryToken();
+
+                <input type="hidden" name="IdProcedimento" value="@Model.IdProcedimento" />
+
+                <h2 class="card-title">Ricerca procedimento da verificare</h2>
+                <br />
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownList("IdReport", "Report", Model.ElencoReport, null, optionLabel: "Selezionare un report", required: true, useBootstrapSelect: false)
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary nospinner" title="Vai al report"><i class="far fa-file-alt"></i> Vai al report</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

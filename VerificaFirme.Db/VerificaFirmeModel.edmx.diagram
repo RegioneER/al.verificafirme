@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="33c29284c5e445009a6e44628bab15d4" Name="Diagram1">
+        <EntityTypeShape EntityType="VerificaFirmeModel.CategorieEsclusione" Width="1.5" PointX="0.75" PointY="2.125" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.CategorieSanabilita" Width="1.5" PointX="3" PointY="7.125" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Comuni" Width="1.5" PointX="5.75" PointY="6.75" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Modulo" Width="1.5" PointX="3" PointY="1" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.ModuloNominativo" Width="1.5" PointX="5.25" PointY="1.125" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.ModuloNominativoLog" Width="1.5" PointX="7.5" PointY="2" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Parametri" Width="1.5" PointX="7.75" PointY="5.75" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Procedimento" Width="1.5" PointX="1.5" PointY="10.25" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.ProcedimentoPostazione" Width="1.5" PointX="0.75" PointY="7" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Profilo" Width="1.5" PointX="3.75" PointY="14.25" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Province" Width="1.5" PointX="8.75" PointY="8.75" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Regioni" Width="1.5" PointX="9.75" PointY="0.75" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Stato" Width="1.5" PointX="1.5" PointY="15.25" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.Utente" Width="1.5" PointX="3.75" PointY="10.875" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.UtenteProfilo" Width="1.5" PointX="6" PointY="11" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.vvComune" Width="1.5" PointX="9.75" PointY="3.75" />
+        <EntityTypeShape EntityType="VerificaFirmeModel.vvProvincia" Width="1.5" PointX="10.75" PointY="6.75" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_Modulo_CategorieEsclusione" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_ModuloNominativo_CategorieEsclusione" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_ModuloNominativo_CategorieSanabilita" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_Modulo_ProcedimentoPostazione" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_ModuloNominativo_Modulo" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_ModuloNominativoLog_ModuloNominativo" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_Procedimento_Stato" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_ProcedimentoPostazione_Procedimento" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_UtenteProfilo_Profilo" />
+        <AssociationConnector Association="VerificaFirmeModel.FK_UtenteProfilo_Utente" />
+        <AssociationConnector Association="VerificaFirmeModel.UtenteProcedimento" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

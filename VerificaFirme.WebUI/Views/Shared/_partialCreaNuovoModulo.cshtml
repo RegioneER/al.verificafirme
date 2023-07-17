@@ -1,0 +1,110 @@
+﻿@using RER.Tools.MVC.Agid
+@model VerificaFirme.WebUI.Models.ModuloViewModel
+
+@{
+
+    var controller = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString();
+}
+
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h3 class="card-title">Avvio nuova procedura</h3>
+            <br />
+            @if (Model.ElencoPostazioni.Count() > 0)
+            {
+                //string formAct = Model.FromCompila ? "SalvaCompletaEProsegui" : "CreaModulo";
+                string classCol = Model.FromCompila ? "col-md-3" : "col-md-2";
+                string classColNom = Model.FromCompila ? "col-md-4" : "col-md-2";
+
+                <input type="hidden" id="IdProcedimento" name="IdProcedimento" value="@Model.Procedimento.ID">
+                if (Model.FromCompila)
+                {
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <p>Indicare il nuovo modulo che si vuole inserire. Cliccando sul pulsante "Completa e prosegui su un nuovo modulo", il modulo attuale verrà verificato e completato. In caso di errori nessun nuovo modulo verrà creato.</p>
+                        </div>
+                    </div>
+                    <br />
+                }
+                <div class="row">
+                    <div class="col-xs-12 @classCol">
+                        @Html.AgidDropDownList("CodPostazione", "Seleziona postazione", Model.ElencoPostazioni, null, required: true, externalDivAdditionalClasses: "myPostazioni", useBootstrapSelect: false)
+                    </div>
+                    <div class="col-xs-12 @classCol">
+                        @Html.AgidDropDownList("NrModulo", "Seleziona Modulo", Model.ElencoModuli(Model.ElencoPostazioni.FirstOrDefault().Value), null, required: true, externalDivAdditionalClasses: "myModuli", useBootstrapSelect: false)
+                    </div>
+                    <div class="col-xs-12 @classColNom">
+                        @Html.AgidTextBox("NrNominativi", "Numero nominativi", ExtensionMethods.TextBoxType.Number, "", isRequired: (controller == "Modulo"), min: 1, max: Model.NumeroMaxRigheModulo, step: 1)
+                    </div>
+                    @if (!Model.FromCompila)
+                    {
+                        <div class="col-3">
+                            <button class="btn nospinner" type="submit" title="Avvia la procedura"><i class="fas fa-list-ul"></i> Avvia procedura</button>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    Tutte le postazioni sono state inserite per questo procedimento.
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+        @{
+          var baseUrl = string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority.Replace(":" + Request.Url.Port, ""), Url.Content("~"));
+        }
+            $(document).ready(function () {
+                try {
+                    $("#CodPostazione").change(function () {
+                        getModuli();
+                    });
+
+                }
+                catch (err) {
+
+                }
+                finally {
+                }
+
+            });
+
+    function getModuli() {
+
+      var postazione = $("#CodPostazione").val();
+
+    $('#NrModulo').html('');
+    $('#NrModulo').append($("<option></option>").attr("value", '').text('Scegli il modulo'));
+
+      SetOverlay(true);
+
+        try {
+
+        $.ajax({
+           type: "GET",
+            url: '@Url.Action("GetModuliPostazione", "Modulo")',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: { 'idProcedimento': @Model.Procedimento.ID, 'postazione': postazione }
+
+        }).done(function (response) {
+            if (response && response.length > 0) {
+                for (var i = 0; i < response.length; i++) {
+                    $('#NrModulo').append($("<option></option>").attr("value", response[i].Value).text(response[i].Text));
+                }
+            }
+            SetOverlay(false);
+        });
+        } catch (err) {
+            console.error(err);
+            SetOverlay(false);
+        }
+    }
+</script>

@@ -1,0 +1,36 @@
+﻿@model Exception
+@{
+    ViewBag.Title = "Errore";
+}
+
+<div class="form-group col">
+    <div class="alert alert-danger" role="alert">
+        <h4>
+            Si è verificato un errore durante l'esecuzione dell'operazione.
+        </h4>
+        @{
+            bool isTest = Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["IsTestEnvironment"]);
+        }
+        @if (isTest)
+        {
+            if (Model != null)
+            {
+                <p> @Model.Message </p>
+                if (Model.InnerException != null)
+                {
+                    <p>InnerException</p>
+                    <p>@Model.InnerException.Message</p>
+                    <p>@Model.InnerException.StackTrace</p>
+                }
+
+                <p>@Model.StackTrace</p>
+            }
+        }
+        else
+        {
+            <p> Gli amministratori sono stati avvertiti.</p>
+            <p>@Model.Message</p>
+        }
+
+    </div>
+</div>

@@ -1,0 +1,164 @@
+﻿@model VerificaFirme.WebUI.Models.FirmatariDuplicatiViewModel
+@using RER.Tools.MVC.Agid
+@{
+    ViewBag.Title = "Gestione anagrafiche";
+
+
+    SelectList comuni = Model.ElencoComuniRestoItalia;
+    SelectList comuniEr = Model.ElencoComuniPropri;
+    int nrRisultatiAutocomplete = Model.NrMaxRisultatiAutocomplete;
+
+    int nrMinimoCaratteriAutocomplete = Model.NrMinimoCaratteriAutocomplete;
+
+    string getDescComune(string codice)
+    {
+        SelectListItem sli = comuni.FirstOrDefault(x => x.Value == (codice ?? ""));
+        if (sli == null)
+        {
+            sli = comuniEr.FirstOrDefault(x => x.Value == (codice ?? ""));
+        }
+
+        return HttpUtility.JavaScriptStringEncode((sli?.Text ?? ""));
+    }
+
+    bool solaLettura = Model.ProcedimentoConcluso;
+}
+<script src="~/Scripts/accessibleautocomplete.min.js"></script>
+<script>
+    function suggestER(query, populateResults) {
+        if (query.length >= @nrMinimoCaratteriAutocomplete) {
+            const filteredResults = comuniER.filter(comuni => comuni.startsWith(query.toUpperCase()) === true).slice(0, @nrRisultatiAutocomplete);
+
+            if (filteredResults.length == 0) {
+                //debugger;
+                const filteredResultsNonTrovato = comuniER.filter(comuni => comuni.startsWith("NON TROVAT") === true).slice(0, @nrRisultatiAutocomplete);
+                populateResults(filteredResultsNonTrovato);
+            }
+            else {
+                populateResults(filteredResults);
+            }
+        }
+        else
+        {
+            const filteredResults = comuniER.filter(comuni => comuni.startsWith('XXX') === true);
+            populateResults(filteredResults);
+        }
+
+    }
+</script>
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2 class="card-title">Ricerca anagrafiche</h2>
+            @using (Html.BeginForm("AnagraficheDuplicate", "Report", FormMethod.Get, new { @id = "formRicercaDuplicati" }))
+            {
+                <br />
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownList("IdProcedimento", "Procedimento", Model.ElencoProcedimenti, null, optionLabel: "Selezionare un procedimento", required: true, useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        @Html.AgidDropDownList("IdModalita", "Tipo di verifica", Model.ElencoModalita, null, optionLabel: "Selezionare il tipo di verifica", required: true, useBootstrapSelect: false)
+                    </div>
+                </div>
+                <div id="divComuneDuplicati">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <label for="CodComuneListaElettorale" class="control-label">Comune lista elettorale</label>
+                            @if (solaLettura)
+                            {
+                                <input id="CodComuneListaElettorale" name="CodComuneListaElettorale" type="text" class="form-control" value="@getDescComune(Model.CodComuneListaElettorale)" readonly aria-readonly='true' />
+                            }
+                            else
+                            {
+                                <div id="divRighe_CodComuneListaElettorale"></div>
+                                <script>
+                                            element = document.querySelector('#divRighe_CodComuneListaElettorale')
+                                            id = 'CodComuneListaElettorale'
+                                                accessibleAutocomplete({
+                                                    element: element,
+                                                    id: id,
+                                                    name: 'CodComuneListaElettorale',
+                                                    showAllValues: true,
+                                                    source: suggestER,
+                                                    defaultValue: '@getDescComune(Model.CodComuneListaElettorale)',
+                                                    confirmOnBlur: true,
+                                                    autoselect: true,
+                                                    dropdownArrow: () => '',
+                                                    tNoResults: () => 'Comune non trovato',
+                                                    readonly: true,
+                                                    lblby: 'hmElettorale'
+                                                })
+                                </script>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @Html.AgidCheckBoxFor(model => model.SoloDaCorreggere)
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-xs-12">
+                        <button type="submit" class="btn btn-primary" title="Cerca tra i procedimenti"><i class='fas fa-search' aria-hidden="true"></i> Cerca</button>
+                        <a href="@Url.Action("AnagraficheDuplicate")" class="btn btn-secondary" title="Pulisci"><i class="fas fa-undo"></i> Pulisci</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.IdModalita == 1)
+{
+    @Html.Partial("_partialDuplicate", Model)
+}
+else
+{
+    @Html.Partial("_partialMinori", Model)
+}
+
+<script>
+
+     @Html.Raw("const comuni = [")
+        @foreach (var item in comuni)
+        {
+            @Html.Raw("'" + item.Text.Replace("'", "\\'") + "',\n");
+        }
+        @Html.Raw("];")
+
+        @Html.Raw("const comuniER = [")
+        @foreach (var item in comuniEr)
+        {
+            @Html.Raw("'" + item.Text.Replace("'", "\\'") + "',\n");
+        }
+
+    @Html.Raw("];")
+
+
+
+    $(document).ready(function () {
+
+        if ($('#formRicercaDuplicati #IdModalita').val() == "1") {
+            $('#formRicercaDuplicati #divComuneDuplicati').show();
+        }
+        else {
+            $('#formRicercaDuplicati #divComuneDuplicati').hide();
+        }
+
+
+        $('#formRicercaDuplicati #IdModalita').on("change", function (e) {
+            if ($('#formRicercaDuplicati #IdModalita').val() == "1") {
+                $('#formRicercaDuplicati #divComuneDuplicati').show();
+            }
+            else {
+                $('#formRicercaDuplicati #divComuneDuplicati').hide();
+            }
+
+        });
+    });
+</script>

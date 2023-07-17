@@ -1,0 +1,286 @@
+﻿@model VerificaFirme.WebUI.Models.FirmatariDuplicatiViewModel
+@using RER.Tools.MVC.Agid
+@{
+
+    SelectList comuni = Model.ElencoComuniRestoItalia;
+    SelectList comuniEr = Model.ElencoComuniPropri;
+    int nrRisultatiAutocomplete = Model.NrMaxRisultatiAutocomplete;
+
+
+    string getDescComune(string codice)
+    {
+        SelectListItem sli = comuni.FirstOrDefault(x => x.Value == (codice ?? ""));
+        if (sli == null)
+        {
+            sli = comuniEr.FirstOrDefault(x => x.Value == (codice ?? ""));
+        }
+
+        return HttpUtility.JavaScriptStringEncode((sli?.Text ?? ""));
+    }
+
+    string getDescComuneNoEncode(string codice)
+    {
+        SelectListItem sli = comuni.FirstOrDefault(x => x.Value == (codice ?? ""));
+        if (sli == null)
+        {
+            sli = comuniEr.FirstOrDefault(x => x.Value == (codice ?? ""));
+        }
+        return sli?.Text ?? "";
+    }
+
+
+    bool solaLettura = Model.ProcedimentoConcluso;
+}
+
+@if (Model.RisultatoDuplicati != null)
+{
+    <div class="card-wrapper card-space">
+        <div class="card card-bg">
+            <div class="card-body">
+                <h2 class="card-title">Nominativi duplicati</h2>
+                @using (Html.BeginForm("SalvaModifiche", "Report", FormMethod.Post, new { @id = "formCorrezioneDuplicati" }))
+                {
+                    @Html.AntiForgeryToken();
+
+                    string chkErrori = Model.SoloDaCorreggere ? "true" : "false";
+
+                    <input type="hidden" name="CodComuneListaElettorale" id="Ab_CodComuneListaElettorale" value="@Model.CodComuneListaElettorale" />
+                    <input type="hidden" name="SoloDaCorreggere" id="Ab_SoloDaCorreggere" value="@chkErrori" />
+                    <input type="hidden" name="IdProcedimento" value="@Model.IdProcedimento" />
+                    if (Model.RisultatoDuplicati.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-condensed table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">
+                                            <label id="hmRiga">#</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmPostazione">Postazione.Modulo</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmNome">Nome</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmCognome">Cognome</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmNascita">Luogo nascita</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmData">Data nascita</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmElettorale">Comune elet.</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmNullita">Cat. nullità</label>
+                                        </th>
+                                        <th scope="col">
+                                            <label id="hmNote">Note</label>
+                                        </th>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int i = 0;
+                                        long? ragrauppamento = -1;
+                                    }
+                                    @foreach (var item in Model.RisultatoDuplicati)
+                                    {
+                                        if (ragrauppamento == -1)
+                                        {
+                                            ragrauppamento = item.Raggruppamento;
+                                        }
+                                        if (ragrauppamento != item.Raggruppamento)
+                                        {
+                                            ragrauppamento = item.Raggruppamento;
+                                            <tr style="line-height:2px;" class="table-secondary">
+                                                <td colspan="9">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                        }
+
+                                        <tr>
+                                            <td>
+                                                @item.NumeroRiga
+                                                <input type="hidden" name="RigheVerificate[@i].IDModulo" id="RigheVerificate_@(i)IDModulo" value="@item.IDModulo">
+                                                <input type="hidden" name="RigheVerificate[@i].NrRiga" id="RigheVerificate_@(i)_NrRiga" value="@item.NumeroRiga">
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Compila", "Modulo", new { @IdModulo = item.IDModulo })">@item.CodicePostazione.@item.Numero</a>
+                                            </td>
+                                            <td>
+                                                @HttpUtility.HtmlDecode(item.Nome)
+                                            </td>
+                                            <td>
+                                                @HttpUtility.HtmlDecode(item.Cognome)
+                                            </td>
+                                            <td>
+                                                @HttpUtility.HtmlDecode(getDescComuneNoEncode(item.CodComuneNascita))
+                                            </td>
+                                            <td>
+                                                @item.DataNascita.Value.ToString("dd/MM/yyyy")
+                                            </td>
+                                            <td>
+                                                @HttpUtility.HtmlDecode(getDescComuneNoEncode(item.CodComuneListaElettorale))
+                                            </td>
+                                            <td>
+                                                @if (solaLettura)
+                                                {
+                                                    SelectListItem cat = Model.CategorieNullita.FirstOrDefault(x => x.Value == item.CodCategorieEsclusione);
+                                                    string testo = cat != null ? cat.Text : "NESSUNA";
+
+                                                    <input id="RigheVerificate_@(i)_CategoriaNullita" name="RigheVerificate[@i].CategoriaNullita" type="text" class="form-control text-uppercase" aria-labelledby="hmNullita" value="@testo" readonly aria-readonly='true'>
+                                                }
+                                                else
+                                                {
+                                                    <div class="select-wrapper">
+                                                        <select id="RigheVerificate_@(i)_CategoriaNullita" name="RigheVerificate[@i].CategoriaNullita" title="" aria-labelledby="hmNullita">
+                                                            <option label="nessuna" value="" @(string.IsNullOrWhiteSpace(item.CodCategorieEsclusione) ? "selected" : "") data-content="<span class='select-pill'><span class='select-pill-text'></span></span>"></option>
+                                                            @foreach (var cat in Model.CategorieNullita)
+                                                            {
+                                                                <option @(cat.Value == item.CodCategorieEsclusione ? "selected" : "") value="@cat.Value">@cat.Text</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (string.IsNullOrWhiteSpace(item.Note))
+                                                {
+                                                    <button id="btnNota_@(i)" class="btn btn-link nospinner" data-idmodulo="@item.IDModulo" data-id="@i" onclick='ModificaNota(this);' type="button"><i id="idNotaAssente_@(i)" class="far fa-comment-alt"></i></button>
+                                                }
+                                                else
+                                                {
+                                                    <button id="btnNota_@(i)" class="btn btn-link nospinner" title="@item.Note" data-toggle="tooltip" data-idmodulo="@item.IDModulo" data-id="@i" data-nota="@item.Note" onclick='ModificaNota(this);' type="button"><i id="idNotaPresente_@(i)" class="fas fa-comment-alt"></i></button>
+                                                }
+                                                <input type="hidden" id="RigheVerificate_@(i)_Note" name="RigheVerificate[@i].Note" value="@item.Note">
+                                            </td>
+                                        </tr>
+                                        i++;
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
+                        if (!solaLettura)
+                        {
+                            <br />
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    <button type="submit" id="btnSalva" class="btn btn-primary" title="Salva il modulo"><i class="far fa-save"></i> Salva</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <p>Nessun dato trovato</p>
+                            </div>
+                        </div>
+                    }
+
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="it-example-modal">
+        <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modalNota" aria-labelledby="modalNotaTitle">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalNotaTitle">Modifica nota</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Chiudi">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><span id="idSpanNota"></span></p>
+                        <br />
+                        <input type="hidden" id="IdProcedimentoNota" name="IdProcedimentoNota" value="@Model.IdProcedimento">
+                        <input type="hidden" id="IdModuloNota" name="IdModuloNota" value="">
+                        <input type="hidden" id="IdRigaModuloNota" name="IdRigaModuloNota">
+                        @Html.AgidTextArea("NotaRigaModulo", "Nota", "", id: "idNotaRigaModulo", maxLenght: "256")
+                    </div>
+                    @if (!solaLettura)
+                    {
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-primary btn-sm nospinner" type="button" title="Modifica la nota" onclick="SalvaNota();"><i class="far fa-edit"></i> <span id="spnBtnNota"></span></button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+
+    function ModificaNota(e) {
+        var numeroRiga = $(e).data('id');
+        var idModulo = $(e).data('idmodulo');
+        var notaRiga = $(e).data('nota');
+
+        try {
+            $("#modalNota #idSpanNota").text('Modifica la nota per la riga numero ' + numeroRiga + '.');
+            if (notaRiga == "" || notaRiga == undefined) {
+                $("#modalNota #spnBtnNota").text('Aggiungi una nota');
+            }
+            else {
+                $("#modalNota #spnBtnNota").text('Modifica la nota');
+            }
+
+            $("#modalNota #IdRigaModuloNota").val(numeroRiga);
+            $("#modalNota #IdModuloNota").val(idModulo);
+            $("#modalNota #idNotaRigaModulo").val(notaRiga);
+            $("#modalNota #idNotaRigaModulo").siblings("label").prop("class", "active");
+
+            $('#modalNota').modal('show');
+        }
+        finally { }
+    }
+
+    function SalvaNota() {
+        try {
+            var idRiga = $("#modalNota #IdRigaModuloNota").val();
+            var idModuloRiga = "#RigheVerificate_" + idRiga + "_Note";
+            var notaInserita = $("#modalNota #idNotaRigaModulo").val();
+            $(idModuloRiga).val(notaInserita);
+
+            $('#btnNota_' + idRiga).data('nota', notaInserita);
+
+            /*$('#btnNota_' + idRiga).tooltip({ title: notaInserita });*/
+
+            $('#btnNota_' + idRiga).tooltip('hide')
+                .attr('data-original-title', notaInserita)
+                .tooltip('show');
+
+            //far assente. fas presente
+
+            if (notaInserita == "") {
+                $('#idNotaAssente_' + idRiga).removeClass('fas fa-comment-alt');
+                $('#idNotaAssente_' + idRiga).addClass('far fa-comment-alt');
+
+                $('#idNotaPresente_' + idRiga).removeClass('fas fa-comment-alt');
+                $('#idNotaPresente_' + idRiga).addClass('far fa-comment-alt');
+            }
+            else {
+                $('#idNotaAssente_' + idRiga).removeClass('far fa-comment-alt');
+                $('#idNotaAssente_' + idRiga).addClass('fas fa-comment-alt');
+
+                //$('#idNotaPresente_' + idRiga).removeClass('fas fa-comment-alt');
+                //$('#idNotaPresente_' + idRiga).addClass('far fa-comment-alt');
+
+            }
+
+
+            $('#modalNota').modal('hide');
+        }
+        finally { }
+    }
+</script>

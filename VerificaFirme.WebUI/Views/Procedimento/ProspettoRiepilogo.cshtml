@@ -1,0 +1,119 @@
+﻿@model VerificaFirme.WebUI.Models.ProspettoViewModel
+@{
+    int moduliCompletati = Model.Postazioni.SelectMany(x => x.Dettaglio).Where(x => x.Completamento == VerificaFirme.WebUI.Models.ProspettoViewModel.TipoCompletamentoModulo.Compilato).Count();
+    int moduliInCompilazione = Model.Postazioni.SelectMany(x => x.Dettaglio).Where(x => x.Completamento == VerificaFirme.WebUI.Models.ProspettoViewModel.TipoCompletamentoModulo.ParzialmenteCompilato).Count();
+    int moduliNonCompilati = Model.Postazioni.SelectMany(x => x.Dettaglio).Where(x => x.Completamento == VerificaFirme.WebUI.Models.ProspettoViewModel.TipoCompletamentoModulo.NonCompilato).Count();
+}
+
+@{
+    ViewBag.Title = "Prospetto riepilogo";
+}
+
+<div class="card-wrapper card-space">
+    <div class="card card-bg">
+        <div class="card-body">
+            <h2 class="card-title">@Model.TitoloProcedimento</h2>
+            <div class="row">
+                <div class="col-xs-12">
+                    <span>Quorum @(Model.NumeroFirme.ToString("N0"))/@Model.QuorumFirme.ToString("N0") </span><br />
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-xs-2">
+                    Moduli compilati <div style="background-color: lightgreen; color: black !important" class="chip chip-simple text-white" title="Moduli compilati: @moduliCompletati.ToString("N0")" data-toggle="tooltip"><i class="fas fa-star" aria-hidden="true"></i> @moduliCompletati.ToString("N0")</div>
+                </div>
+                <div class="col-xs-1 ">
+                    &nbsp;
+                </div>
+                <div class="col-xs-2">
+                    Moduli in compilazione <div style="background-color: yellow; color: black !important" class="chip chip-simple text-white" title="Moduli in compilazione: @moduliInCompilazione.ToString("N0")" data-toggle="tooltip"><i class="fas fa-star-half-alt" aria-hidden="true"></i> @moduliInCompilazione.ToString("N0")</div>
+                </div>
+                <div class="col-xs-1 ">
+                    &nbsp;
+                </div>
+                <div class="col-xs-2">
+                    Moduli da compilare <div style="background-color: lightcoral; color: black !important" class="chip chip-simple text-white" title="Moduli non compilati: @moduliNonCompilati.ToString("N0")" data-toggle="tooltip"><i class="far fa-star" aria-hidden="true"></i> @moduliNonCompilati.ToString("N0")</div>
+                </div>
+            </div>
+            <br />
+            <div class="row overflow-auto">
+                <div class="col-xs-12">
+                    <div class="table-responsive-sm">
+                        @{
+
+                            int maxModuli = Model.Postazioni.Max(x => x.Dettaglio.Count);
+                            int numColspan = maxModuli > 6 ? 6 : maxModuli;
+                        }
+                        <table class="table ">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="noBordo">Postazione</th>
+                                    <th scope="col" class="noBordo" colspan="@numColspan"># Modulo</th>
+                                    @{
+
+                                        for (int i = 7; i <= maxModuli; i++)
+                                        {
+                                            <th scope="col" class="noBordo tdPiccola">&nbsp;</th>
+                                        }
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (VerificaFirme.WebUI.Models.ProspettoViewModel.ProspettoDettaglio pp in Model.Postazioni)
+                                {
+
+                                    int numeroCella = 0;
+                                    <tr class="trBassa">
+                                        <td class="noBordo text-center tdPiccola"><strong>@pp.Postazione</strong></td>
+
+                                        @foreach (VerificaFirme.WebUI.Models.ProspettoViewModel.ProspettoModuloDettaglio pmd in pp.Dettaglio)
+                                        {
+                                            string colore = "";
+                                            string riempimento = "";
+                                            string sronly = "";
+
+                                            if (pmd.Completamento == VerificaFirme.WebUI.Models.ProspettoViewModel.TipoCompletamentoModulo.Compilato)
+                                            {
+                                                colore = "lightgreen";
+                                                sronly = $"postazione {pp.Postazione} modulo {pmd.Modulo} modulo compilato";
+                                                riempimento = "fas fa-star";
+
+                                            }
+                                            else if (pmd.Completamento == VerificaFirme.WebUI.Models.ProspettoViewModel.TipoCompletamentoModulo.NonCompilato)
+                                            {
+                                                colore = "lightcoral";
+                                                sronly = $"postazione {pp.Postazione} modulo {pmd.Modulo} modulo da compilare";
+                                                riempimento = "far fa-star";
+                                            }
+                                            else
+                                            {
+                                                colore = "yellow";
+                                                sronly = $"postazione {pp.Postazione} modulo {pmd.Modulo} modulo in compilazione";
+                                                riempimento = "fas fa-star-half-alt";
+                                            }
+
+                                            <td class="conBordo tdPiccola" style="background-color: @colore" title="@string.Format("{0}.{1}<br/>{2}", pp.Postazione, pmd.Modulo, pmd.CompletamentoTesto)" data-toggle="tooltip" data-html="true">
+                                                <i class="@riempimento" aria-hidden="true"></i>
+                                                <span class="sr-only">@sronly</span>
+                                            </td>
+
+                                            numeroCella++;
+                                        }
+                                        @if (numeroCella < maxModuli)
+                                        {
+                                            int colSpan = maxModuli - numeroCella;
+                                            <td colspan="@colSpan" class="noBordo tdPiccola"></td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
