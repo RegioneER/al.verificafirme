@@ -51,15 +51,15 @@ Nella tabella Parametri presente sul database è possibile configurare alcune op
 1. **APN**: titolo dell'applicazione
 2. **ASA**: abilitazione del salvataggio automatico dei moduli
 3. **CR**: codice della regione (tabella Regioni) - in base alla regione impostata, i comuni della lista elettorali verranno filtrati sulla regione scelta
-4. **GIL**: nome del pdf contenente la guida in linea
+4. **GIL**: nome del file pdf contenente la guida in linea
 5. **LGO**: url di logout
 6. **MAF**: anno minino per i firmatari
 7. **MMP**: numero massimo di moduli per singolo procedimento
 8. **MNRM**: numero massimo di righe per singolo modulo
 9. **MPP**: massimo numero di postazioni per procedimento
 10. **MQP**: massimo quorum per procedimento
-11. **NMCA**: numero minimo di caratteri da imputare per l'autocompletamento di ricerca per i comuni
-12. **NMRA**: massimo numero di risultato per i risultati dell'autocompletamento di ricerca per i comuni
+11. **NMCA**: numero minimo di caratteri da inputare per l'autocompletamento di ricerca per i comuni
+12. **NMRA**: numero massimo di risultati per l'autocompletamento di ricerca per i comuni
 13. **SSA**: numero di secondi di attesa per il salvataggio automatico
 
 
